@@ -1,15 +1,39 @@
+import { Console } from '@woowacourse/mission-utils';
+import parseToObjectArray from '../utils/mdParser';
+
 class InventoryManager {
   #prodcuts;
+  #promoProducts;
+  #regularProducts;
   #promotions;
 
   constructor(products, promotions) {
-    this.#prodcuts = products;
-    this.#promotions = promotions;
+    this.#prodcuts = parseToObjectArray(public / products.md);
+    this.#promoProducts = products.filter(
+      (product) => product.promotion !== null
+    );
+    this.#regularProducts = products.filter(
+      (product) => product.promotion === null
+    );
+    this.#promotions = parseToObjectArray(public / promotions.md);
   }
+
   // 결제가능여부 체크
-  isPaymentEligible(products) {
-    if (products.quantity < quantity) {
-      throw new Error('[ERROR]');
+  checkPaymentEligibility(productName, quantity) {
+    // 같은 이름으로 필터링
+    const matchingProduct = products.filter(
+      (product) => product.name === productName
+    );
+
+    // 재고 합산
+    const totalQuantity = matchingProduct.reduce(
+      (acc, product) => acc + product.quantity,
+      0
+    );
+    if (totalQuantity < quantity) {
+      throw new Error(
+        '[ERROR] 재고 수량을 초과하여 구매할 수 없습니다. 다시 입력해 주세요.'
+      );
     }
   }
   // 프로모션 우선 차감
@@ -56,8 +80,16 @@ class InventoryManager {
   }
 
   // 프로모션 재고가 부족할 때 일반 재고로 판매됨을 공지
-  notifyRegularStockUser(products) {}
+  async notifyRegularStockUser(product, quantity) {
+    if (product.quantity < quantity) {
+      return await Console.readLineAsync(`현재 ${product} ${
+        quantity - product.quanntity
+      }개는 프로모션 할인이 적용되지 않습니다. 그래도 구매하시겠습니까? (Y/N)
+`);
+    }
+  }
 
-  // 재고 업데이트
-  updateStock(products) {}
+  syncProducts() {
+    this.products = [...this.promArray, ...this.regularArray];
+  }
 }
