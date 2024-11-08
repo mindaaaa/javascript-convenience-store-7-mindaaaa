@@ -1,6 +1,6 @@
 import { Console } from '@woowacourse/mission-utils';
-import parseToObjectArray from '../utils/mdParser';
 import Promotion from './Promotion.js';
+import { PRODUCTS, PROMOTIONS } from '../utils/constants.js';
 
 // TODO: Promotion에서 날짜 기준으로 배열 가져오기
 class InventoryManager {
@@ -8,26 +8,31 @@ class InventoryManager {
   #promoProducts;
   #regularProducts;
   #promotions;
+  #activePromoProducts;
 
-  constructor(products, promotions) {
-    this.#products = parseToObjectArray(public / products.md);
-    this.#promoProducts = products.filter(
+  constructor() {
+    this.#products = PRODUCTS;
+
+    this.#promoProducts = this.#products.filter(
       (product) => product.promotion !== null
     );
     this.#regularProducts = products.filter(
       (product) => product.promotion === null
     );
 
-    this.#promotions = parseToObjectArray(public / promotions.md);
+    this.#promotions = PROMOTIONS;
+
+    this.#activePromoProducts = this.#getActivePromoProducts();
   }
 
-  getPromotionType() {
-    // 유효한 프로모션 찾기
-    const promotion = new Promotion();
-    const validPromotions = promotion.getValidPromotions(this.#promotions);
+  #getActivePromoProducts() {
+    const activePromotions = Promotion.getValidPromotions(this.#promotions);
 
-    const promotionType = validPromotions.map; // 여기부터 구현하기
+    return this.#promoProducts.filter((product) =>
+      activePromotions.some((promo) => promo.name === product.promotion)
+    );
   }
+
   applyDeduction(productName, quantity) {
     // TODO: handle이 이름 더 낫지 않나
     const { promoProduct, regularProduct } = this.#findProduct(productName);
@@ -177,3 +182,16 @@ class InventoryManager {
     return (this.products = [...this.promArray, ...this.regularArray]);
   }
 }
+
+export default InventoryManager;
+
+// 1. 구매 요청이 들어오면, 요청된 제품에 대해 유효한 프로모션인지 확인
+// 유효한 프로모션 목록에 해당 제품의 프로모션이 포함되어 있으면, 프로모션 재고 차감이 필요
+
+// 2. 제품이 프로모션을 가지고 있을 때 먼저 프로모션 재고를 확인
+// 추가 증정 가능 여부를 먼저 판단하고 프로모션 재고를 확인함
+
+// 3. 프로모션 기간에 무조건 프로모션 재고 우선차감
+
+// 4. 일반 재고 차감 여부 안내
+// 프로모션 재고가 부족한 경우 일반 재고 사용 여부를 물음

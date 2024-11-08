@@ -1,5 +1,6 @@
 import { Console } from '@woowacourse/mission-utils';
 import { MESSAGES } from '../utils/constants.js';
+import Validator from '../validation/Validator.js';
 
 class InputHandler {
   async askPurchaseInput() {
