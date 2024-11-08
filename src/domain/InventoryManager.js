@@ -1,31 +1,31 @@
 import { Console } from '@woowacourse/mission-utils';
 import parseToObjectArray from '../utils/mdParser';
 
+// TODO: Promotion에서 날짜 기준으로 배열 가져오기
 class InventoryManager {
-  #prodcuts;
+  #products;
   #promoProducts;
   #regularProducts;
   #promotions;
 
   constructor(products, promotions) {
-    this.#prodcuts = parseToObjectArray(public / products.md);
+    this.#products = parseToObjectArray(public / products.md);
     this.#promoProducts = products.filter(
       (product) => product.promotion !== null
     );
     this.#regularProducts = products.filter(
       (product) => product.promotion === null
     );
+
     this.#promotions = parseToObjectArray(public / promotions.md);
   }
 
-  // 결제가능여부 체크
+  // TODO: product.quantity의 타입 확인(문자열/숫자)
   checkPaymentEligibility(productName, quantity) {
-    // 같은 이름으로 필터링
     const matchingProduct = products.filter(
       (product) => product.name === productName
     );
 
-    // 재고 합산
     const totalQuantity = matchingProduct.reduce(
       (acc, product) => acc + product.quantity,
       0
@@ -36,29 +36,35 @@ class InventoryManager {
       );
     }
   }
-  // 프로모션 우선 차감
-  // 프로모션 배열/그냥 배열 나눠서 가지고있기
-  applyPromoDedcution(products, promoProduct, quantity) {
-    this.isPaymentEligible(products);
-    if (promoProduct.quantity > quantity) {
-      promoProduct.quantity -= quantity;
+  // TODO: promoProduct나 regularProduct가 없는 경우 undefined 반환 생각하기
+  applyPromoDedcution(productName, quantity) {
+    const promoProduct = this.#promoProducts.find(
+      (product) => product.name === productName
+    );
+    const regularProduct = this.#regularProducts.find(
+      (product) => product.name === productName
+    );
+
+    if (promoProduct.quantity >= quantity) {
+      return (promoProduct.quantity -= quantity);
     }
-    if (quantity > promoProduct.quantity) {
-      quantity -= promoProduct.quantity;
-      this.isPaymentEligible(products);
-      products.quantity -= quantity;
+
+    if (quantity > regularProduct.quantity) {
+      const remainingQuantity = quantity - promoProduct.quantity;
+      promoProduct.quantity = 0;
+      return (regularProduct.quantity -= remainingQuantity);
     }
   }
   // 프로모션 받을 수 있을 때 받겠습니까 안내
-  async notifyTwoPlusOnePromoOption(quanntity, products) {
-    if (!quanntity % 2) {
+  async notifyTwoPlusOnePromoOption(quantity, products) {
+    if (!quantity % 2) {
       return await Console.readLineAsync(`현재 ${products.name}은(는) 1개를 무료로 더 받을 수 있습니다. 추가하시겠습니까? (Y/N)
 `);
     }
   }
 
-  async nottifyOnePlusOnePromoOption(quanntity, products) {
-    if (quanntity % 2) {
+  async nottifyOnePlusOnePromoOption(quantity, products) {
+    if (quantity % 2) {
       return await Console.readLineAsync(
         `현재 ${products.name}은(는) 1개를 무료로 더 받을 수 있습니다. 추가하시겠습니까? (Y/N)`
       );
@@ -83,7 +89,7 @@ class InventoryManager {
   async notifyRegularStockUser(product, quantity) {
     if (product.quantity < quantity) {
       return await Console.readLineAsync(`현재 ${product} ${
-        quantity - product.quanntity
+        quantity - product.quantity
       }개는 프로모션 할인이 적용되지 않습니다. 그래도 구매하시겠습니까? (Y/N)
 `);
     }
