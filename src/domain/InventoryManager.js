@@ -20,8 +20,70 @@ class InventoryManager {
     this.#promotions = parseToObjectArray(public / promotions.md);
   }
 
+  applyDeduction(productName, quantity) {
+    // TODO: handle이 이름 더 낫지 않나
+    const { promoProduct, regularProduct } = this.#findProduct(productName);
+
+    if (promoProduct && regularProduct) {
+      this.deductPromoAndRegular(promoProduct, regularProduct, quantity);
+    }
+    if (promoProduct) {
+      this.deductPromoSockOnly(promoProduct, quantity);
+    }
+    if (regularProduct) {
+      this.deductRegularStockOnly(regularProduct, quantity);
+    }
+    if (!(promoProduct && regularProduct)) {
+      this.handleMissingProduct(productName);
+    }
+  }
+
+  #findProduct(productName) {
+    const promoProduct = this.#promoProducts.find(
+      (product) => product.name === productName
+    );
+    const regularProduct = this.#regularProducts.find(
+      (product) => product.name === productName
+    );
+    return { promoProduct, regularProduct };
+  }
+
+  deductPromoAndRegular() {
+    // 프로모션 받을 수 있는 경우 안내 사항
+    // 결제 가능 여부 확인
+    this.#checkPaymentEligibility(productName, quantity);
+
+    this.#applyPromoDedcution(productName, quantity);
+
+    // 프로모션 우선 차감
+    this.#syncProducts();
+  }
+
+  // 프로모션 재고만 있는 경우
+  deductPromoSockOnly() {
+    // 프로모션 받을 수 있는 경우 안내 사항
+    // 결제 가능 여부 확인
+    // 프로모션 우선 차감
+    syncProducts();
+  }
+
+  // 일반 재고만 있는 경우
+  deductRegularStockOnly() {
+    // 결제 가능 여부 확인
+    syncProducts();
+  }
+
+  async handleMissingProduct(productName) {
+    // TODO: 에러 메시지를 던지고 입력받을 수 있는 로직 구현
+    if (!this.#products.find((product) => product.name === productName)) {
+      return await Console.readLineAsync(
+        '[ERROR] 존재하지 않는 상품입니다. 다시 입력해 주세요.'
+      );
+    }
+  }
+
   // TODO: product.quantity의 타입 확인(문자열/숫자)
-  checkPaymentEligibility(productName, quantity) {
+  #checkPaymentEligibility(productName, quantity) {
     const matchingProduct = products.filter(
       (product) => product.name === productName
     );
@@ -37,7 +99,7 @@ class InventoryManager {
     }
   }
   // TODO: promoProduct나 regularProduct가 없는 경우 undefined 반환 생각하기
-  applyPromoDedcution(productName, quantity) {
+  #applyPromoDedcution(productName, quantity) {
     const promoProduct = this.#promoProducts.find(
       (product) => product.name === productName
     );
@@ -55,23 +117,38 @@ class InventoryManager {
       return (regularProduct.quantity -= remainingQuantity);
     }
   }
-  // 프로모션 받을 수 있을 때 받겠습니까 안내
-  async notifyTwoPlusOnePromoOption(quantity, products) {
-    if (!quantity % 2) {
-      return await Console.readLineAsync(`현재 ${products.name}은(는) 1개를 무료로 더 받을 수 있습니다. 추가하시겠습니까? (Y/N)
+
+  async #notifyTwoPlusOnePromoOption(quantity, product) {
+    if (quantity % 3 === 2) {
+      const response =
+        await Console.readLineAsync(`현재 ${product.name}은(는) 1개를 무료로 더 받을 수 있습니다. 추가하시겠습니까? (Y/N)
 `);
+
+      try {
+        this.#confirmPromoDeduction(response, product);
+      } catch (error) {
+        Console.print(error.message);
+        await this.#nottifyOnePlusOnePromoOption(quantity, product);
+      }
     }
   }
 
-  async nottifyOnePlusOnePromoOption(quantity, products) {
+  async #nottifyOnePlusOnePromoOption(quantity, product) {
     if (quantity % 2) {
-      return await Console.readLineAsync(
-        `현재 ${products.name}은(는) 1개를 무료로 더 받을 수 있습니다. 추가하시겠습니까? (Y/N)`
+      const response = await Console.readLineAsync(
+        `현재 ${product.name}은(는) 1개를 무료로 더 받을 수 있습니다. 추가하시겠습니까? (Y/N)`
       );
+
+      try {
+        this.#confirmPromoDeduction(response, product);
+      } catch (error) {
+        Console.print(error.message);
+        await this.#nottifyOnePlusOnePromoOption(quantity, product);
+      }
     }
   }
 
-  confirmPromoDeduction(response, product) {
+  #confirmPromoDeduction(response, product) {
     if (/^y$/i.test(response.trim()) && /^n$/i.test(response.trim())) {
       throw new Error(
         '[ERROR] 올바르지 않은 형식으로 입력했습니다. 다시 입력해 주세요.'
@@ -79,9 +156,6 @@ class InventoryManager {
     }
     if (/^y$/i.test(response.trim())) {
       return (product.quantity -= 1);
-    }
-    if (/^n$/i.test(response.trim())) {
-      return product.quantity;
     }
   }
 
@@ -95,7 +169,7 @@ class InventoryManager {
     }
   }
 
-  syncProducts() {
-    this.products = [...this.promArray, ...this.regularArray];
+  #syncProducts() {
+    return (this.products = [...this.promArray, ...this.regularArray]);
   }
 }
