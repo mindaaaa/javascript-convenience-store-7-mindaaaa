@@ -3,7 +3,7 @@ import { DateTimes } from '@woowacourse/mission-utils';
 class Promotion {
   #date;
 
-  constructor(date) {
+  constructor() {
     this.#date = DateTimes.now();
   }
 
