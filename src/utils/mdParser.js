@@ -8,8 +8,15 @@ export default function parseToObjectArray(filePath) {
 
   const parsedData = lines.slice(1).map((line) => {
     const values = line.split(',').map((value) => value.trim());
+
     return headers.reduce((obj, header, index) => {
-      obj[header] = values[index];
+      let value = values[index];
+
+      if (header === 'price' || header === 'quantity') {
+        value = Number(value);
+      }
+
+      obj[header] = value;
       return obj;
     }, {});
   });
