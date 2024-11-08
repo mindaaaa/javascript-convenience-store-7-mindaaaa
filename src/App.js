@@ -1,8 +1,5 @@
-import mdParser from './utils/mdParser.js';
 class App {
-  async run() {
-    console.log(mdParser('public/products.md'));
-  }
+  async run() {}
 }
 
 export default App;
