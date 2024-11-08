@@ -1,5 +1,6 @@
 import { Console } from '@woowacourse/mission-utils';
 import parseToObjectArray from '../utils/mdParser';
+import Promotion from './Promotion.js';
 
 // TODO: Promotion에서 날짜 기준으로 배열 가져오기
 class InventoryManager {
@@ -20,6 +21,13 @@ class InventoryManager {
     this.#promotions = parseToObjectArray(public / promotions.md);
   }
 
+  getPromotionType() {
+    // 유효한 프로모션 찾기
+    const promotion = new Promotion();
+    const validPromotions = promotion.getValidPromotions(this.#promotions);
+
+    const promotionType = validPromotions.map; // 여기부터 구현하기
+  }
   applyDeduction(productName, quantity) {
     // TODO: handle이 이름 더 낫지 않나
     const { promoProduct, regularProduct } = this.#findProduct(productName);
@@ -49,37 +57,11 @@ class InventoryManager {
   }
 
   deductPromoAndRegular() {
-    // 프로모션 받을 수 있는 경우 안내 사항
-    // 결제 가능 여부 확인
+    this.#findProduct(productName);
     this.#checkPaymentEligibility(productName, quantity);
-
+    // TODO: 프로모션을 더 받을 수 있음을 알리는 핸들
     this.#applyPromoDedcution(productName, quantity);
-
-    // 프로모션 우선 차감
     this.#syncProducts();
-  }
-
-  // 프로모션 재고만 있는 경우
-  deductPromoSockOnly() {
-    // 프로모션 받을 수 있는 경우 안내 사항
-    // 결제 가능 여부 확인
-    // 프로모션 우선 차감
-    syncProducts();
-  }
-
-  // 일반 재고만 있는 경우
-  deductRegularStockOnly() {
-    // 결제 가능 여부 확인
-    syncProducts();
-  }
-
-  async handleMissingProduct(productName) {
-    // TODO: 에러 메시지를 던지고 입력받을 수 있는 로직 구현
-    if (!this.#products.find((product) => product.name === productName)) {
-      return await Console.readLineAsync(
-        '[ERROR] 존재하지 않는 상품입니다. 다시 입력해 주세요.'
-      );
-    }
   }
 
   // TODO: product.quantity의 타입 확인(문자열/숫자)
@@ -98,6 +80,7 @@ class InventoryManager {
       );
     }
   }
+
   // TODO: promoProduct나 regularProduct가 없는 경우 undefined 반환 생각하기
   #applyPromoDedcution(productName, quantity) {
     const promoProduct = this.#promoProducts.find(
@@ -115,6 +98,31 @@ class InventoryManager {
       const remainingQuantity = quantity - promoProduct.quantity;
       promoProduct.quantity = 0;
       return (regularProduct.quantity -= remainingQuantity);
+    }
+  }
+
+  // 프로모션 재고만 있는 경우
+  deductPromoSockOnly() {
+    this.#findProduct(productName);
+    this.#checkPaymentEligibility(productName, quantity);
+    promoProduct.quantity -= quantity;
+    return syncProducts();
+  }
+
+  // 일반 재고만 있는 경우
+  deductRegularStockOnly() {
+    this.#findProduct(productName);
+    this.#checkPaymentEligibility(productName, quantity);
+    regularProduct -= quantity;
+    return syncProducts();
+  }
+
+  async handleMissingProduct(productName) {
+    // TODO: 에러 메시지를 던지고 입력받을 수 있는 로직 구현
+    if (!this.#products.find((product) => product.name === productName)) {
+      return await Console.readLineAsync(
+        '[ERROR] 존재하지 않는 상품입니다. 다시 입력해 주세요.'
+      );
     }
   }
 
