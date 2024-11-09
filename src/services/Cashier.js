@@ -25,6 +25,16 @@ class Cashier {
       this.applyRegularDeduction(regularProduct, requestedQuantity);
     }
   }
+
+  async handleOnePlusOnePromo(promoProduct, quantity) {
+    const unit = Math.floor(quantity / 1);
+    const remainder = quantity % 1;
+
+    if (promoProduct.quantity >= unit + remainder) {
+      return await this.notifyExtraProm(promoProduct, sets);
+    }
+    this.notifyOutOfPromoStock(promoProduct, quantity - promoProduct.quantity);
+  }
 }
 
 export default new Cashier();
