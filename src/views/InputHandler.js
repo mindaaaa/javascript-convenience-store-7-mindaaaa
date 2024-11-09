@@ -4,6 +4,7 @@ import Validator from '../validation/Validator.js';
 
 class InputHandler {
   async askPurchaseInput() {
+    // TODO: 객체 배열로 parse하는 코드 만들기
     try {
       const userInput = await Console.readLineAsync(
         '구매하실 상품명과 수량을 입력해 주세요. (예: [사이다-2],[감자칩-1])'

@@ -2,18 +2,19 @@ import { Console } from '@woowacourse/mission-utils';
 import Promotion from './Promotion.js';
 import { PRODUCTS, PROMOTIONS } from '../utils/constants.js';
 
+// 입력을 숫자로 받아서
+// 출력을 4개로
 // TODO: Promotion에서 날짜 기준으로 배열 가져오기
 class InventoryManager {
   #products;
-  #promoProducts;
+  #activePromoProducts;
   #regularProducts;
   #promotions;
-  #activePromoProducts;
 
-  constructor() {
+  constructor(productName, requestedQuantity) {
     this.#products = PRODUCTS;
 
-    this.#promoProducts = this.#products.filter(
+    this.#activePromoProducts = this.#products.filter(
       (product) => product.promotion !== null
     );
     this.#regularProducts = products.filter(
@@ -34,7 +35,6 @@ class InventoryManager {
   }
 
   applyDeduction(productName, quantity) {
-    // TODO: handle이 이름 더 낫지 않나
     const { promoProduct, regularProduct } = this.#findProduct(productName);
 
     if (promoProduct && regularProduct) {
@@ -179,7 +179,11 @@ class InventoryManager {
   }
 
   #syncProducts() {
-    return (this.products = [...this.promArray, ...this.regularArray]);
+    this.#products = [...this.promArray, ...this.regularArray];
+  }
+
+  get products() {
+    return this.#products;
   }
 }
 

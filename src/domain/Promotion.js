@@ -1,26 +1,27 @@
 import { DateTimes } from '@woowacourse/mission-utils';
 
 class Promotion {
-  #date;
-
-  constructor() {
-    this.#date = DateTimes.now();
-  }
-
-  #getToday() {
-    const regex = /^\d{4}-\d{2}-\d{2}$/;
-
-    return this.#date.match(regex)[0];
-  }
-
   gatValidPromotions(promotions) {
-    const today = new Date(this.#getToday());
+    const today = DateTimes.now();
+
     return promotions.filter((promotion) => {
       const startDate = new Date(promotion.start_date);
-      const endDate = new Date(promotion.end_date);
+      const endDate = this.#convertEndDate(promotion.end_date);
 
       return today >= startDate && today <= endDate;
     });
+  }
+
+  #convertEndDate(endDate) {
+    const date = new Date(endDate);
+    return new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate(),
+      23,
+      59,
+      59
+    );
   }
 
   // 탄산2+1
