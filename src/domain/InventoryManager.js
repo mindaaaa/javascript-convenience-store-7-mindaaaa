@@ -2,9 +2,6 @@ import { Console } from '@woowacourse/mission-utils';
 import Promotion from './Promotion.js';
 import { PRODUCTS, PROMOTIONS } from '../utils/constants.js';
 
-// 입력을 숫자로 받아서
-// 출력을 4개로
-// TODO: Promotion에서 날짜 기준으로 배열 가져오기
 class InventoryManager {
   #products;
   #promotions;
@@ -14,11 +11,11 @@ class InventoryManager {
   constructor(productName, requestedQuantity) {
     this.#products = PRODUCTS;
     this.#promotions = PROMOTIONS;
-    this.#activePromoProducts = this.#getActivePromProducts();
-    this.#regularProducts = this.#getRegularProducts();
+    this.#activePromoProducts = this.getActivePromProducts();
+    this.#regularProducts = this.getRegularProducts();
   }
 
-  #getActivePromProducts() {
+  getActivePromProducts() {
     const activePromotions = Promotion.getValidPromotions(this.#promotions);
 
     return this.#products.filter((product) =>
@@ -26,7 +23,7 @@ class InventoryManager {
     );
   }
 
-  #getRegularProducts() {
+  getRegularProducts() {
     const activePromotions = Promotion.getValidPromotions(this.#promotions);
     return this.#products.filter(
       (product) =>
@@ -45,6 +42,32 @@ class InventoryManager {
       (product) => product.name === productName
     );
     return { promoProduct, regularProduct };
+  }
+
+  getPromoProduct(productName) {
+    return this.#activePromoProducts.find(
+      (product) => product.name === productName
+    );
+  }
+
+  getRegularProduct(productName) {
+    return this.#regularProducts.find(
+      (product) => product.name === productName
+    );
+  }
+
+  // TODO: Validator에서 걸러지므로 추가 수령만 확인
+  #isNotPaymentEligible(productName, requestedQuantity) {
+    const matchingProduct = PRODUCTS.filter(
+      (product) => product.name === productName
+    );
+
+    const totalQuantity = matchingProduct.reduce(
+      (acc, product) => acc + product.quantity,
+      0
+    );
+
+    return totalQuantity < requestedQuantity;
   }
 
   #syncProducts() {

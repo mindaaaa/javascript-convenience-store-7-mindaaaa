@@ -12,13 +12,13 @@ class Validator {
 
     const requestedProducts = userInput.match(/\[([^\]]+)\]/g);
     requestedProducts.forEach((productInput) => {
-      const { name } = this.#parseProductInput(productInput);
+      const { name, quantity } = Validator.parseProductInput(productInput);
       this.#isValidProduct(name);
       this.#checkPaymentEligibility(name, quantity);
     });
   }
 
-  #parseProductInput(userInput) {
+  static parseProductInput(userInput) {
     const [name, quantity] = userInput.slice(1, -1).split('-');
     return { name, quantity: Number(quantity) };
   }

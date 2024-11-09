@@ -138,24 +138,24 @@ class InventoryManagerV2 {
 // }
 
 // // TODO: promoProduct나 regularProduct가 없는 경우 undefined 반환 생각하기
-// #applyPromoDedcution(productName, quantity) {
-//   const promoProduct = this.#promoProducts.find(
-//     (product) => product.name === productName
-//   );
-//   const regularProduct = this.#regularProducts.find(
-//     (product) => product.name === productName
-//   );
+#applyPromoDedcution(productName, quantity) {
+  const promoProduct = this.#promoProducts.find(
+    (product) => product.name === productName
+  );
+  const regularProduct = this.#regularProducts.find(
+    (product) => product.name === productName
+  );
 
-//   if (promoProduct.quantity >= quantity) {
-//     return (promoProduct.quantity -= quantity);
-//   }
+  if (promoProduct.quantity >= quantity) {
+    return (promoProduct.quantity -= quantity);
+  }
 
-//   if (quantity > regularProduct.quantity) {
-//     const remainingQuantity = quantity - promoProduct.quantity;
-//     promoProduct.quantity = 0;
-//     return (regularProduct.quantity -= remainingQuantity);
-//   }
-// }
+  if (quantity > regularProduct.quantity) {
+    const remainingQuantity = quantity - promoProduct.quantity;
+    promoProduct.quantity = 0;
+    return (regularProduct.quantity -= remainingQuantity);
+  }
+}
 
 // // 프로모션 재고만 있는 경우
 // deductPromoSockOnly() {
