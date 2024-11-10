@@ -19,20 +19,20 @@ class Cashier {
           promProduct.promotion === 'MD추천상품' ||
           promProduct.promotion === '반짝할인'
         ) {
-          resultQuantity = await this.handleOnePlusOnePromo(
+          resultQuantity = await this.#handleOnePlusOnePromo(
             promProduct,
             quantity
           );
         }
         if (promProduct.promotion === '탄산2+1') {
-          resultQuantity = await this.handleTwoPlusOnePromo(
+          resultQuantity = await this.#handleTwoPlusOnePromo(
             promoProduct,
             quantity
           );
         }
       }
       if (regularProduct) {
-        resultQuantity = this.applyRegularDeduction(regularProduct, quantity);
+        resultQuantity = this.#applyRegularDeduction(regularProduct, quantity);
       }
 
       let promotion = null;
@@ -45,7 +45,7 @@ class Cashier {
     return results; // [{name: '콜라', quantity: 3, promotion: '탄산2+1'}, ...]
   }
 
-  async handleOnePlusOnePromo(promoProduct, quantity) {
+  async #handleOnePlusOnePromo(promoProduct, quantity) {
     const requiredPromoStock = quantity * 2;
 
     if (promoProduct.quantity >= requiredPromoStock) {
@@ -79,7 +79,7 @@ class Cashier {
     }
   }
 
-  applyRegularDeduction(product, quantity) {
+  #applyRegularDeduction(product, quantity) {
     const regularProduct = this.inventoryManager.getRegularProduct(
       product.name
     );
@@ -87,7 +87,7 @@ class Cashier {
     regularProduct.quantity -= quantity;
   }
 
-  async handleTwoPlusOnePromo(promoProduct, quantity) {
+  async #handleTwoPlusOnePromo(promoProduct, quantity) {
     const sets = Math.floor(quantity / 2);
     const requiredPromoStock = sets * 3;
     const remainder = quantity % 2;
