@@ -1,39 +1,29 @@
 import { DateTimes } from '@woowacourse/mission-utils';
 
 class Promotion {
-  getValidPromotions(promotions) {
-    const today = DateTimes.now();
+  #name;
+  #quantity;
+  #valid;
 
-    return promotions.filter((promotion) => {
-      const startDate = new Date(promotion.start_date);
-      const endDate = this.#convertEndDate(promotion.end_date);
-
-      return today >= startDate && today <= endDate;
-    });
+  constructor({ name = '', type = null, quantity = 0, start_date, end_date }) {
+    this.#name = name;
+    this.#quantity = quantity;
+    this.#valid = this.#refineDateRange(start_date, end_date);
   }
 
-  #convertEndDate(endDate) {
-    const date = new Date(endDate);
-    return new Date(
-      date.getFullYear(),
-      date.getMonth(),
-      date.getDate(),
-      23,
-      59,
-      59
-    );
-  }
+  #refineDateRange(start_date, end_date) {
+    if (!start_date && !end_date) {
+      return null;
+    }
 
-  // 탄산2+1
-  #applyTwoPlusOnePromo(quantity) {
-    const sets = Math.floor(quantity / 2);
-    return sets * 3 + (quantity % 2);
-  }
+    const date = new Date(end_date);
+    date.setHours(date.getHours() + 23);
+    date.setMinutes(date.getMinutes() + 59);
+    date.setSeconds(date.getSeconds() + 59);
+    date.setMilliseconds(date.getMilliseconds() + 999);
 
-  // 반짝할인/MD추천상품
-  #applyOnePlusOnePromo(quantity) {
-    return quantity * 2;
+    return { from: new Date(start_date), to: date };
   }
 }
 
-export default new Promotion();
+export default Promotion;
