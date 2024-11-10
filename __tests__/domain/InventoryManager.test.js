@@ -14,10 +14,11 @@ jest.mock('../../src/domain/InventoryManager.js');
 jest.mock('../../src/views/InputHandler.js');
 
 describe('Cashier의 handlePurchase 메서드를 테스트한다.', () => {
+  let mockInventory;
   let cashier;
 
   beforeEach(() => {
-    const mockInventory = new InventoryManager();
+    mockInventory = new InventoryManager();
     cashier = new Cashier(mockInventory);
 
     mockInventory.getPromProduct.mockImplementation((name) => {
@@ -31,12 +32,13 @@ describe('Cashier의 handlePurchase 메서드를 테스트한다.', () => {
       return { name, quantity: 15, promotion: null };
     });
 
+    jest.spyOn(InputHandler, 'askForConfirmation');
     mockNowDate('2024-11-10T00:00:00.000Z');
   });
 
   test('2+1 프로모션의 추가 증정을 수락한다.', async () => {
     // given
-    jest.spyOn(InputHandler, 'askForConfirmation').mockResolvedValue(true);
+    InputHandler.askForConfirmation.mockResolvedValue(true);
 
     // when
     const result = await cashier.handlePurchase([
@@ -52,7 +54,7 @@ describe('Cashier의 handlePurchase 메서드를 테스트한다.', () => {
 
   test('2+1 프로모션의 추가 증정을 거부한다.', async () => {
     // given
-    jest.spyOn(InputHandler, 'askForConfirmation').mockResolvedValue(false);
+    InputHandler.askForConfirmation.mockResolvedValue(false);
 
     // when
     const result = await cashier.handlePurchase([
@@ -68,9 +70,7 @@ describe('Cashier의 handlePurchase 메서드를 테스트한다.', () => {
 
   test('프로모션 재고가 부족할 때 정가 결제 수락 여부를 테스트한다.', async () => {
     // given
-    jest;
-    jest
-      .spyOn(InputHandler, 'askForConfirmation')
+    InputHandler.askForConfirmation
       .mockResolvedValueOnce(true)
       .mockResolvedValueOnce(false);
 

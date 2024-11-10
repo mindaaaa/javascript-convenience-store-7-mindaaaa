@@ -33,7 +33,7 @@ class Cashier {
         }
       }
       if (regularProduct) {
-        resultQuantity = this.#applyRegularDeduction(regularProduct, quantity);
+        resultQuantity = this.applyRegularDeduction(regularProduct, quantity);
       }
 
       let promotion = null;
@@ -58,10 +58,11 @@ class Cashier {
 
       if (isExtraPromo) {
         promProduct.quantity -= requiredPromoStock;
+        return requiredPromoStock;
       }
-      if (!isExtraPromo) {
-        promProduct.quantity -= quantity;
-      }
+
+      promProduct.quantity -= quantity;
+      return quantity;
     } else {
       const promoUnitsAvailable = Math.floor(promProduct.quantity / 2);
       const remainingUnits = quantity - promoUnitsAvailable;
@@ -75,17 +76,21 @@ class Cashier {
       );
 
       if (confirmRegular) {
-        this.#applyRegularDeduction(promProduct, remainingUnits);
+        this.applyRegularDeduction(promProduct, remainingUnits);
+        return promoUnitsAvailable * 2 + remainingUnits;
       }
+
+      return promoUnitsAvailable * 2;
     }
   }
 
-  #applyRegularDeduction(product, quantity) {
+  applyRegularDeduction(product, quantity) {
     const regularProduct = this.inventoryManager.getRegularProduct(
       product.name
     );
 
     regularProduct.quantity -= quantity;
+    return quantity;
   }
 
   async #handleTwoPlusOnePromo(promProduct, quantity) {
@@ -102,10 +107,10 @@ class Cashier {
 
       if (isExtraPromo) {
         promProduct.quantity -= sets * 3 + remainder;
+        return sets * 3 + remainder;
       }
-      if (!isExtraPromo) {
-        promProduct.quantity -= quantity;
-      }
+      promProduct.quantity -= quantity;
+      return quantity;
     } else {
       const promoSetsAvailable = Math.floor(promProduct.quantity / 3);
       const promoQuantity = promoSetsAvailable * 3;
@@ -120,8 +125,14 @@ class Cashier {
       );
 
       if (confirmRegular) {
-        this.#applyRegularDeduction(promProduct, remainingQuantity);
+        const deductedQuantity = this.applyRegularDeduction(
+          promProduct,
+          remainingQuantity
+        );
+        return promoQuantity + deductedQuantity;
       }
+
+      return promoQuantity;
     }
   }
 }

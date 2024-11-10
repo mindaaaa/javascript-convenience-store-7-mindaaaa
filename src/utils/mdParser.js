@@ -1,25 +1,42 @@
 import { readFileSync } from 'fs';
 
-export default function parseToObjectArray(filePath) {
-  const file = readFileSync(filePath, 'utf8');
-  const lines = file.split('\n').filter((line) => line.includes(','));
+const Strategy = {
+  name: (_value) => _value,
+  price: (_value) => Number(_value),
+  quantity: (_value) => Number(_value),
+  promotion: (_value) => {
+    if (_value === 'null') {
+      return null;
+    }
+    return _value;
+  },
+  buy: (_value) => Number(_value),
+  get: (_value) => Number(_value),
+  start_date: (_value) => new Date(_value),
+  end_date: (_value) => new Date(_value),
+};
 
-  const headers = lines[0].split(',').map((header) => header.trim());
+class MdFileReader {
+  read(filePath) {
+    const file = readFileSync(filePath, 'utf8');
+    const lines = file.split('\n').filter((e) => e);
 
-  const parsedData = lines.slice(1).map((line) => {
-    const values = line.split(',').map((value) => value.trim());
+    const [headers, ...restRows] = lines.map((line) => {
+      return line.split(',').map((value) => value.trim());
+    });
 
-    return headers.reduce((obj, header, index) => {
-      let value = values[index];
+    const parsedData = restRows.map((values) => {
+      return headers.reduce((obj, header, index) => {
+        const currStrategy = Strategy[header];
 
-      if (header === 'price' || header === 'quantity') {
-        value = Number(value);
-      }
+        obj[header] = currStrategy(values[index]);
 
-      obj[header] = value;
-      return obj;
-    }, {});
-  });
+        return obj;
+      }, {});
+    });
 
-  return parsedData;
+    return parsedData;
+  }
 }
+
+export default new MdFileReader();
