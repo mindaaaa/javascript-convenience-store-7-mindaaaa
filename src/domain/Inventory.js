@@ -31,12 +31,12 @@ class Inventory {
       freebieCount,
     } = this.#promotion.getAvailableQuantity(requestedQuantity);
 
-    const regularQuantity = requestedQuantity - promotionalQuantity;
+    const nonPromoQuantity = requestedQuantity - promotionalQuantity;
 
     if (violation === PromotionViolation.ONE_MORE) {
       return this.#createPaymentSummary(
         requestedQuantity,
-        regularQuantity,
+        nonPromoQuantity,
         promotionalQuantity,
         freebieCount,
         violation,
@@ -46,17 +46,17 @@ class Inventory {
     if (violation === PromotionViolation.OUT_OF_STOCK) {
       return this.#createPaymentSummary(
         requestedQuantity,
-        regularQuantity,
+        nonPromoQuantity,
         promotionalQuantity,
         freebieCount,
         violation,
-        diff
+        nonPromoQuantity
       );
     }
 
     return this.#createPaymentSummary(
       requestedQuantity,
-      regularQuantity,
+      nonPromoQuantity,
       promotionalQuantity,
       freebieCount,
       violation,

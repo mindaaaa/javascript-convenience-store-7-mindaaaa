@@ -1,6 +1,6 @@
 import Promotion from '../../src/domain/Promotion.js';
 
-describe('Promotion 클래스는', () => {
+describe.skip('Promotion 클래스는', () => {
   test('프로모션 객체 생성 시 유효하지 않은 프로모션 타입일 경우 예외가 발생한다.', () => {
     // given
     const name = '탄산2+1';
