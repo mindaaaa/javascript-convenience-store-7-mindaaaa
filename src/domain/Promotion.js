@@ -1,9 +1,12 @@
 import { DateTimes } from '@woowacourse/mission-utils';
+import { PromotionType } from '../utils/constants';
+import PromotionStrategy from './strategy/index.js';
 
 class Promotion {
   #name;
   #quantity;
   #valid;
+  #stratege;
 
   constructor({ name = '', type = null, quantity = 0, start_date, end_date }) {
     this.#name = name;
@@ -33,6 +36,8 @@ class Promotion {
     if (this.#isExpired) {
       return { quantity: 0, violation: null };
     }
+
+    return this.#stratege.execute(this.#quantity, requestedQuantity);
   }
 
   get #isExpired() {
