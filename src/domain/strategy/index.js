@@ -1,6 +1,6 @@
 import { PromotionType } from '../../utils/constants.js';
-import NBuyGetOne from './NBuyGetOne.js';
-import NoneStratege from './NoneStratege.js';
+import NBuyGetOnePromotion from './NBuyGetOnePromotion.js';
+import NoneStrategy from './NoneStrategy.js';
 
 const Strategy = {
   [PromotionType.TWO_PLUS_ONE]: new XPlusOnePromotion(2),

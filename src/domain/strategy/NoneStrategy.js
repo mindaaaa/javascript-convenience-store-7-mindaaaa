@@ -1,4 +1,4 @@
-class NoneStratege {
+class NoneStrategy {
   get name() {
     return 'NoneStratege';
   }

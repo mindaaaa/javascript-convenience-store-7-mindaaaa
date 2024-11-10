@@ -4,3 +4,8 @@ export const PromotionType = {
   TIME_SALE: 'TIME_SALE',
   NONE: 'NONE',
 };
+
+export const PromotionViolation = {
+  OUT_OF_STOCK: 'OUT_OF_STOCK',
+  ONE_MORE: 'ONE_MORE',
+};
