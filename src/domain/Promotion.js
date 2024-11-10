@@ -12,6 +12,7 @@ class Promotion {
     this.#name = name;
     this.#quantity = quantity;
     this.#valid = this.#refineDateRange(start_date, end_date);
+    this.#stratege = PromotionStrategy.from(type || PromotionType.NONE);
   }
 
   #refineDateRange(start_date, end_date) {
@@ -58,6 +59,13 @@ class Promotion {
     }
 
     this.#quantity -= quantity;
+  }
+
+  get summary() {
+    return {
+      name: this.#name,
+      quantity: this.#quantity,
+    };
   }
 }
 

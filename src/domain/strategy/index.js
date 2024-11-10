@@ -3,9 +3,9 @@ import NBuyGetOnePromotion from './NBuyGetOnePromotion.js';
 import NoneStrategy from './NoneStrategy.js';
 
 const Strategy = {
-  [PromotionType.TWO_PLUS_ONE]: new XPlusOnePromotion(2),
-  [PromotionType.MD_RECOMMEND]: new XPlusOnePromotion(1),
-  [PromotionType.TIME_SALE]: new XPlusOnePromotion(1),
+  [PromotionType.TWO_PLUS_ONE]: new NBuyGetOnePromotion(2),
+  [PromotionType.MD_RECOMMEND]: new NBuyGetOnePromotion(1),
+  [PromotionType.TIME_SALE]: new NBuyGetOnePromotion(1),
   [PromotionType.NONE]: NoneStrategy,
 };
 
