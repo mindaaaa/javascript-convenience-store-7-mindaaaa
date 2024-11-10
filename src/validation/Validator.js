@@ -10,12 +10,16 @@ class Validator {
       );
     }
 
-    const requestedProducts = userInput.match(/\[([^\]]+)\]/g);
-    requestedProducts.forEach((productInput) => {
-      const { name, quantity } = Validator.parseProductInput(productInput);
+    const requestedProducts = userInput
+      .match(/\[([^\]]+)\]/g)
+      .map((productInput) => Validator.parseProductInput(productInput));
+
+    requestedProducts.forEach(({ name, quantity }) => {
       this.#isValidProduct(name);
       this.#checkPaymentEligibility(name, quantity);
     });
+
+    return requestedProducts;
   }
 
   static parseProductInput(userInput) {

@@ -24,6 +24,8 @@ class Cashier {
     if (regularProduct) {
       this.applyRegularDeduction(regularProduct, requestedQuantity);
     }
+
+    return result; // 최종 차감될 quantity
   }
 
   async handleOnePlusOnePromo(promoProduct, quantity) {
@@ -35,6 +37,28 @@ class Cashier {
     }
     this.notifyOutOfPromoStock(promoProduct, quantity - promoProduct.quantity);
   }
+
+  async handleTwoPlusOnePromo(promoProduct, quantity) {
+    const unit = Math.floor(quantity / 2);
+    const remainder = quantity % 2;
+
+    // 프로모션이 가능한지 검증
+    if (promoProduct.quantity >= unit * 3 + remainder) {
+      return await this.offerExtraPromo(promoProduct, unit, '탄산2+1');
+    } else {
+      this.notifyOutOfPromoStock(
+        promoProduct,
+        quantity - promoProduct.quantity
+      );
+    }
+
+    // 프로모션 재고 부족 시 일반 재고에서 차감
+    if (remainder > 0) {
+      this.applyRegularDeduction(promoProduct, remainder);
+    }
+  }
+
+  async notifyOutOfPromoStock(promoProduct, quantity) {}
 }
 
 export default new Cashier();
