@@ -76,47 +76,53 @@ class Cashier {
       if (confirmRegular) {
         this.applyRegularDeduction(promoProduct, remainingUnits);
       }
-
-      if (!confirmRegular) {
-        const finalQuantity = quantity - remainingUnits;
-        this.applyRegularDeduction(promoProduct, finalQuantity);
-      }
     }
   }
 
-  // 일반 재고에서 차감하는 메서드
   applyRegularDeduction(product, quantity) {
     const regularProduct = this.inventoryManager.getRegularProduct(
       product.name
     );
-    if (regularProduct && regularProduct.quantity >= quantity) {
-      regularProduct.quantity -= quantity;
-    } else {
-      throw new Error('[ERROR] 일반 재고가 부족합니다.');
-    }
+
+    regularProduct.quantity -= quantity;
   }
 
   async handleTwoPlusOnePromo(promoProduct, quantity) {
-    const unit = Math.floor(quantity / 2);
+    const sets = Math.floor(quantity / 2);
+    const requiredPromoStock = sets * 3;
     const remainder = quantity % 2;
 
-    // 프로모션이 가능한지 검증
-    if (promoProduct.quantity >= unit * 3 + remainder) {
-      return await this.offerExtraPromo(promoProduct, unit, '탄산2+1');
-    } else {
-      this.notifyOutOfPromoStock(
-        promoProduct,
-        quantity - promoProduct.quantity
+    if (promoProduct.quantity >= requiredPromoStock + remainder) {
+      const isExtraPromo = await this.askForConfirmation(
+        'promo',
+        promoProduct.name,
+        sets
       );
-    }
 
-    // 프로모션 재고 부족 시 일반 재고에서 차감
-    if (remainder > 0) {
-      this.applyRegularDeduction(promoProduct, remainder);
+      if (isExtraPromo) {
+        promoProduct.quantity -= sets * 3 + remainder;
+      }
+      if (!isExtraPromo) {
+        promoProduct.quantity -= quantity;
+      }
+    } else {
+      const promoSetsAvailable = Math.floor(promoProduct.quantity / 3);
+      const promoQuantity = promoSetsAvailable * 3;
+      const remainingQuantity = quantity - promoSetsAvailable * 2;
+
+      promoProduct.quantity -= promoQuantity;
+
+      const confirmRegular = await this.askForConfirmation(
+        'noPromo',
+        promoProduct.name,
+        remainingQuantity
+      );
+
+      if (confirmRegular) {
+        this.applyRegularDeduction(promoProduct, remainingQuantity);
+      }
     }
   }
-
-  async notifyOutOfPromoStock(promoProduct, quantity) {}
 }
 
 export default new Cashier();
