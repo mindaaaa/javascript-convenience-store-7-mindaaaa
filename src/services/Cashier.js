@@ -46,13 +46,54 @@ class Cashier {
   }
 
   async handleOnePlusOnePromo(promoProduct, quantity) {
-    const unit = Math.floor(quantity / 1);
-    const remainder = quantity % 1;
+    const requiredPromoStock = quantity * 2;
 
-    if (promoProduct.quantity >= unit + remainder) {
-      return await this.notifyExtraProm(promoProduct, sets);
+    if (promoProduct.quantity >= requiredPromoStock) {
+      const isExtraPromo = await this.askForConfirmation(
+        'promo',
+        promoProduct.name,
+        quantity
+      );
+
+      if (isExtraPromo) {
+        promoProduct.quantity -= requiredPromoStock;
+      }
+      if (!isExtraPromo) {
+        promoProduct.quantity -= quantity;
+      }
+    } else {
+      const promoUnitsAvailable = Math.floor(promoProduct.quantity / 2);
+      const remainingUnits = quantity - promoUnitsAvailable;
+
+      promoProduct.quantity -= promoUnitsAvailable * 2;
+
+      const confirmRegular = await this.askForConfirmation(
+        'noPromo',
+        promoProduct.name,
+        remainingUnits
+      );
+
+      if (confirmRegular) {
+        this.applyRegularDeduction(promoProduct, remainingUnits);
+      }
+
+      if (!confirmRegular) {
+        const finalQuantity = quantity - remainingUnits;
+        this.applyRegularDeduction(promoProduct, finalQuantity);
+      }
     }
-    this.notifyOutOfPromoStock(promoProduct, quantity - promoProduct.quantity);
+  }
+
+  // 일반 재고에서 차감하는 메서드
+  applyRegularDeduction(product, quantity) {
+    const regularProduct = this.inventoryManager.getRegularProduct(
+      product.name
+    );
+    if (regularProduct && regularProduct.quantity >= quantity) {
+      regularProduct.quantity -= quantity;
+    } else {
+      throw new Error('[ERROR] 일반 재고가 부족합니다.');
+    }
   }
 
   async handleTwoPlusOnePromo(promoProduct, quantity) {
