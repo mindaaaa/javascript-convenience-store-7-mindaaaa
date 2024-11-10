@@ -12,7 +12,7 @@ class Validator {
 
     const requestedProducts = userInput
       .match(/\[([^\]]+)\]/g)
-      .map((productInput) => Validator.parseProductInput(productInput));
+      .map((productInput) => this.#parseProductInput(productInput));
 
     requestedProducts.forEach(({ name, quantity }) => {
       this.#isValidProduct(name);
@@ -22,7 +22,7 @@ class Validator {
     return requestedProducts;
   }
 
-  static parseProductInput(userInput) {
+  #parseProductInput(userInput) {
     const [name, quantity] = userInput.slice(1, -1).split('-');
     return { name, quantity: Number(quantity) };
   }
@@ -51,17 +51,20 @@ class Validator {
     }
   }
 
-  validateYesNoInput(response) {
+  #validateYesNoInput(response) {
     const userInput = response.trim().toLowerCase();
     if (userInput !== 'y' && userInput !== 'n') {
       throw new Error(
         '[ERROR] 올바르지 않은 형식으로 입력했습니다. 다시 입력해 주세요.'
       );
     }
+    return userInput;
+  }
+
+  parseYesNoResponse(response) {
+    const validatedInput = this.#validateYesNoInput(response);
+    return validatedInput === 'y';
   }
 }
-
-// TODO: [ERROR] 잘못된 입력입니다. 다시 입력해 주세요.
-// userInput이 undefined나 null인 경우로 생각
 
 export default new Validator();

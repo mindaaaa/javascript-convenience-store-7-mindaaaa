@@ -12,7 +12,7 @@ class InputHandler {
       return Validator.validatePurchaseInput(userInput);
     } catch (error) {
       Console.print(error.message);
-      return askPurchaseInput();
+      return this.askPurchaseInput();
     }
   }
 
@@ -21,10 +21,10 @@ class InputHandler {
 
     try {
       const userInput = await Console.readLineAsync(message);
-      return Validator.validateYesNoInput(userInput);
+      return Validator.parseYesNoResponse(userInput);
     } catch (error) {
       Console.print(error.message);
-      return askForConfirmation;
+      return this.askForConfirmation(type, productName, quantity);
     }
   }
 

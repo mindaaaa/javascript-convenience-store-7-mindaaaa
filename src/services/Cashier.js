@@ -6,26 +6,43 @@ class Cashier {
     this.inventoryManager = inventoryManager;
   }
 
-  async handlePurchase(productName, requestedQuantity) {
-    const promProduct = this.inventoryManager.getPromoProduct(productName);
-    const regularProduct = this.inventoryManager.getRegularProduct(productName);
+  async handlePurchase(purchaseRequests) {
+    const results = [];
 
-    if (promProduct) {
-      if (
-        promProduct.promotion === 'MD추천상품' ||
-        promProduct.promotion === '반짝할인'
-      ) {
-        await this.handleOnePlusOnePromo(promProduct, requestedQuantity);
-      }
-      if (promProduct.promotion === '탄산2+1') {
-        await this.handleTwoPlusOnePromo(promoProduct, requestedQuantity);
-      }
-    }
-    if (regularProduct) {
-      this.applyRegularDeduction(regularProduct, requestedQuantity);
-    }
+    for (const { name, quantity } of purchaseRequests) {
+      const promProduct = this.inventoryManager.getPromoProduct(name);
+      const regularProduct = this.inventoryManager.getRegularProduct(name);
+      let resultQuantity;
 
-    return result; // 최종 차감될 quantity
+      if (promProduct) {
+        if (
+          promProduct.promotion === 'MD추천상품' ||
+          promProduct.promotion === '반짝할인'
+        ) {
+          resultQuantity = await this.handleOnePlusOnePromo(
+            promProduct,
+            quantity
+          );
+        }
+        if (promProduct.promotion === '탄산2+1') {
+          resultQuantity = await this.handleTwoPlusOnePromo(
+            promoProduct,
+            quantity
+          );
+        }
+      }
+      if (regularProduct) {
+        resultQuantity = this.applyRegularDeduction(regularProduct, quantity);
+      }
+
+      let promotion = null;
+      if (promProduct) {
+        promotion = promProduct.promotion;
+      }
+
+      results.push({ name, quantity: resultQuantity, promotion });
+    }
+    return results; // [{name: '콜라', quantity: 3, promotion: '탄산2+1'}, ...]
   }
 
   async handleOnePlusOnePromo(promoProduct, quantity) {
