@@ -24,6 +24,36 @@ class Promotion {
 
     return { from: new Date(start_date), to: date };
   }
+
+  getAvaliableQuantity(requestedQuantity) {
+    if (typeof requestedQuantity !== 'number' || requestedQuantity <= 0) {
+      throw new Error('[ERROR] 잘못된 입력입니다. 다시 입력해 주세요.');
+    }
+
+    if (this.#isExpired) {
+      return { quantity: 0, violation: null };
+    }
+  }
+
+  get #isExpired() {
+    if (!this.#valid) {
+      return false;
+    }
+
+    const now = DateTimes.now();
+
+    return now < this.#valid.from || now > this.#valid.to;
+  }
+
+  decrease(quantity) {
+    if (quantity > this.#quantity) {
+      throw new Error(
+        '[ERROR] 재고 수량을 초과하여 구매할 수 없습니다. 다시 입력해 주세요.'
+      );
+    }
+
+    this.#quantity -= quantity;
+  }
 }
 
 export default Promotion;
