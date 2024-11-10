@@ -1,4 +1,4 @@
-import parseToObjectArray from './utils/mdParser.js';
+import parseToObjectArray from './mdParser.js';
 
 export const MESSAGES = {
   promo: (productName) =>

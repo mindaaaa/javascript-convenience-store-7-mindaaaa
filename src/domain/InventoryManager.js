@@ -49,7 +49,7 @@ class InventoryManager {
     this.#syncProducts();
   }
 
-  getPromoProduct(productName) {
+  getPromProduct(productName) {
     return this.#activePromoProducts.find(
       (product) => product.name === productName
     );

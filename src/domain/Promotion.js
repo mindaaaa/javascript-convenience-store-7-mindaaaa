@@ -1,7 +1,7 @@
 import { DateTimes } from '@woowacourse/mission-utils';
 
 class Promotion {
-  gatValidPromotions(promotions) {
+  getValidPromotions(promotions) {
     const today = DateTimes.now();
 
     return promotions.filter((promotion) => {
@@ -36,4 +36,4 @@ class Promotion {
   }
 }
 
-export default Promotion();
+export default new Promotion();
