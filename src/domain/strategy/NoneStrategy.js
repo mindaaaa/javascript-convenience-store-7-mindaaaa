@@ -8,4 +8,4 @@ class NoneStrategy {
   }
 }
 
-export default new NoneStratege();
+export default new NoneStrategy();

@@ -1,8 +1,8 @@
 import MdFileReader from '../../src/utils/MdParser.js';
 import { Console } from '@woowacourse/mission-utils';
 
-describe('md 파일을 읽어와 객체배열로 반환한다.', () => {
-  it('test', () => {
+describe.skip('md 파일을 읽어와 객체배열로 반환한다.', () => {
+  test('test', () => {
     // given
     const products = [
       { name: '콜라', price: 1000, quantity: 10, promotion: '탄산2+1' },

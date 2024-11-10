@@ -6,13 +6,13 @@ class Promotion {
   #name;
   #quantity;
   #valid;
-  #stratege;
+  #strategy;
 
   constructor({ name = '', type = null, quantity = 0, start_date, end_date }) {
     this.#name = name;
     this.#quantity = quantity;
     this.#valid = this.#refineDateRange(start_date, end_date);
-    this.#stratege = PromotionStrategy.from(type || PromotionType.NONE);
+    this.#strategy = PromotionStrategy.from(type || PromotionType.NONE);
   }
 
   #refineDateRange(start_date, end_date) {
@@ -29,7 +29,7 @@ class Promotion {
     return { from: new Date(start_date), to: date };
   }
 
-  getAvaliableQuantity(requestedQuantity) {
+  getAvailableQuantity(requestedQuantity) {
     if (typeof requestedQuantity !== 'number' || requestedQuantity <= 0) {
       throw new Error('[ERROR] 잘못된 입력입니다. 다시 입력해 주세요.');
     }
@@ -38,7 +38,7 @@ class Promotion {
       return { quantity: 0, violation: null };
     }
 
-    return this.#stratege.execute(this.#quantity, requestedQuantity);
+    return this.#strategy.execute(this.#quantity, requestedQuantity);
   }
 
   get #isExpired() {
