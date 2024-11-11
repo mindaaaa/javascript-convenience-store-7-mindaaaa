@@ -1,4 +1,4 @@
-import { ERROR_MESSAGES } from '../utils/constants.js';
+import { ERROR_MESSAGES, SETTINGS } from '../utils/constants.js';
 
 class Cart {
   #items;
@@ -12,8 +12,7 @@ class Cart {
   }
 
   #tryParseToList(userInput) {
-    const regex =
-      /^\[([가-힣a-zA-Z0-9]+)-([1-9]\d*)](,\[([가-힣a-zA-Z0-9]+)-([1-9]\d*)])*$/;
+    const regex = SETTINGS.PRODUCT_QUANTITY_INPUT_PATTERN;
     if (!regex.test(userInput)) {
       throw new Error(ERROR_MESSAGES.INVALID_FORMAT);
     }
@@ -22,7 +21,10 @@ class Cart {
       .trim()
       .split(',')
       .map((e) => {
-        const [name, quantity] = e.trim().slice(1, -1).split('-');
+        const [name, quantity] = e
+          .trim()
+          .slice(1, -1)
+          .split(SETTINGS.PRODUCT_QUANTITY_SEPARATOR);
 
         return { name, quantity: Number(quantity) };
       });

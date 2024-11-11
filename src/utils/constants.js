@@ -18,3 +18,9 @@ export const ERROR_MESSAGES = {
     '[ERROR] 재고 수량을 초과하여 구매할 수 없습니다. 다시 입력해 주세요.',
   INVALID_INPUT: '[ERROR] 잘못된 입력입니다. 다시 입력해 주세요.',
 };
+
+export const SETTINGS = {
+  PRODUCT_QUANTITY_INPUT_PATTERN:
+    /^\[([가-힣a-zA-Z0-9]+)-([1-9]\d*)](,\s*\[([가-힣a-zA-Z0-9]+)-([1-9]\d*)])*$/,
+  PRODUCT_QUANTITY_SEPARATOR: '-',
+};
