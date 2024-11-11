@@ -24,3 +24,17 @@ export const SETTINGS = {
     /^\[([가-힣a-zA-Z0-9]+)-([1-9]\d*)](,\s*\[([가-힣a-zA-Z0-9]+)-([1-9]\d*)])*$/,
   PRODUCT_QUANTITY_SEPARATOR: '-',
 };
+
+export const RECEIPT = {
+  HEADER: '===========W 편의점============',
+  ITEM_HEADER: '상품명\t\t수량\t금액',
+  PROMOTION_HEADER: '===========증\t정=============',
+  FOOTER_DIVIDER: '===============================',
+  TOTAL_PURCHASE_AMOUNT: '총구매액\t',
+  PROMOTION_DISCOUNT: '행사할인\t\t-',
+  MEMBERSHIP_DISCOUNT: '멤버십할인\t\t-',
+  FINAL_AMOUNT: '내실돈\t\t\t',
+};
+
+export const NEW_LINE = '\n';
+export const TAB = '\t';

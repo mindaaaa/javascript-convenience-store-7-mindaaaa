@@ -505,7 +505,7 @@ const promotion = new Promotion(promotionData);
 const availableQuantity = promotion.getAvailableQuantity(3); // 수량에 따른 혜택 제공
 ```
 
-###
+### Receipt 클래스
 
 ###
 

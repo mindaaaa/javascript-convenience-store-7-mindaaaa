@@ -1,3 +1,5 @@
+import { RECEIPT, NEW_LINE, TAB } from '../utils/constants.js';
+
 class Receipt {
   #priceSum;
   #countSum;
@@ -12,33 +14,62 @@ class Receipt {
   }
 
   toString() {
-    const primarySection = this.#data.map((e) => {
-      return `${e.name}\t\t${e.count}\t${e.price.toLocaleString()}`;
-    });
+    return [
+      this.#formatHeader(),
+      this.#formatItem(),
+      this.#formatPromotion(),
+      this.#formatFooter(),
+    ].join(NEW_LINE);
+  }
 
-    const promotionalTargets = this.#data.filter((e) => e.freebie);
+  #formatHeader() {
+    return [RECEIPT.HEADER, RECEIPT.ITEM_HEADER].join(NEW_LINE);
+  }
 
-    const secondarySection = promotionalTargets.map((e) => {
-      return `${e.name}\t\t${e.freebie.count}`;
-    });
+  #formatItem() {
+    return this.#data
+      .map(
+        (item) =>
+          `${item.name}${TAB}${TAB}${
+            item.count
+          }${TAB}${item.price.toLocaleString()}`
+      )
+      .join(NEW_LINE);
+  }
 
-    const discountByPromotion = promotionalTargets.reduce((acc, target) => {
-      return target.freebie.price + acc;
-    }, 0);
+  #formatPromotion() {
+    const promotionalItems = this.#data
+      .filter((item) => item.freebie)
+      .map((item) => `${item.name}${TAB}${TAB}${item.freebie.count}`)
+      .join(NEW_LINE);
+    return [RECEIPT.PROMOTION_HEADER, promotionalItems].join(NEW_LINE);
+  }
 
-    const result =
-      this.#priceSum - discountByPromotion - this.#discountByMembership;
+  #formatFooter() {
+    const discountByPromotion = this.#calculatePromotionDiscount();
+    const finalAmount = this.#calculateFinalAmount(discountByPromotion);
 
-    return `===========W 편의점============
-상품명\t\t수량\t금액
-${primarySection.join('\n')}
-===========증\t정=============
-${secondarySection.join('\n')}
-===============================
-총구매액\t${this.#countSum}\t${this.#priceSum.toLocaleString()}
-행사할인\t\t-${discountByPromotion.toLocaleString()}
-멤버십할인\t\t-${this.#discountByMembership.toLocaleString()}
-내실돈\t\t\t${result.toLocaleString()}`;
+    return [
+      RECEIPT.FOOTER_DIVIDER,
+      `${RECEIPT.TOTAL_PURCHASE_AMOUNT}${
+        this.#countSum
+      }${TAB}${this.#priceSum.toLocaleString()}`,
+      `${RECEIPT.PROMOTION_DISCOUNT}${discountByPromotion.toLocaleString()}`,
+      `${
+        RECEIPT.MEMBERSHIP_DISCOUNT
+      }${this.#discountByMembership.toLocaleString()}`,
+      `${RECEIPT.FINAL_AMOUNT}${finalAmount.toLocaleString()}`,
+    ].join(NEW_LINE);
+  }
+
+  #calculatePromotionDiscount() {
+    return this.#data
+      .filter((item) => item.freebie)
+      .reduce((total, item) => total + item.freebie.price, 0);
+  }
+
+  #calculateFinalAmount(discountByPromotion) {
+    return this.#priceSum - discountByPromotion - this.#discountByMembership;
   }
 }
 
