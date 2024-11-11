@@ -4,36 +4,49 @@ class Cart {
   #items;
 
   constructor(userInput) {
+    this.#validateUserInputFormat(userInput);
+    const parsedList = this.#parseInputToList(userInput);
+
+    this.#items = this.#removeDuplicateItems(parsedList);
+  }
+
+  #validateUserInputFormat(userInput) {
     if (typeof userInput !== 'string' || !userInput.length) {
       throw new Error(ERROR_MESSAGES.INVALID_FORMAT);
     }
 
-    this.#items = this.#tryParseToList(userInput);
+    if (!SETTINGS.PRODUCT_QUANTITY_INPUT_PATTERN.test(userInput)) {
+      throw new Error(ERROR_MESSAGES.INVALID_FORMAT);
+    }
   }
 
-  #tryParseToList(userInput) {
-    const regex = SETTINGS.PRODUCT_QUANTITY_INPUT_PATTERN;
-    if (!regex.test(userInput)) {
-      throw new Error(ERROR_MESSAGES.INVALID_FORMAT);
-    }
-
-    const parsedList = userInput
+  #parseInputToList(userInput) {
+    return userInput
       .trim()
       .split(',')
-      .map((e) => {
-        const [name, quantity] = e
-          .trim()
-          .slice(1, -1)
-          .split(SETTINGS.PRODUCT_QUANTITY_SEPARATOR);
+      .map((e) => this.#parseSingleItem(e.trim()));
+  }
 
-        return { name, quantity: Number(quantity) };
-      });
+  #parseSingleItem(item) {
+    const [name, quantity] = item
+      .slice(1, -1)
+      .split(SETTINGS.PRODUCT_QUANTITY_SEPARATOR);
 
-    if (parsedList.length !== new Set(parsedList.map((e) => e.name)).size) {
-      throw new Error(ERROR_MESSAGES.INVALID_FORMAT);
+    return { name, quantity: Number(quantity) };
+  }
+
+  #removeDuplicateItems(parseList) {
+    const uniqueNames = new Set();
+    const result = [];
+
+    for (const item of parseList) {
+      if (uniqueNames.has(item.name)) {
+        throw new Error(ERROR_MESSAGES.INVALID_FORMAT);
+      }
+      uniqueNames.add(item.name);
+      result.push(item);
     }
-
-    return parsedList;
+    return result;
   }
 
   get goods() {
