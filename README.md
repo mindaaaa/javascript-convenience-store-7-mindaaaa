@@ -677,6 +677,107 @@ async #checkoutStep(confirmedPlans) {
 
 ### 주요 테스트 기능
 
+### Promotion 클래스
+
+1. **유효하지 않은 프로모션 타입 처리**
+
+   - **목적**: `Promotion` 객체 생성 시 유효하지 않은 프로모션 타입이 입력된 경우, 예외 발생 테스트
+   - **테스트 예시**:
+     ```javascript
+     const invalidType = 'INVALID_TYPE';
+     expect(() => {
+       new Promotion({
+         name: '탄산2+1',
+         type: invalidType,
+         quantity: 10,
+         start_date: '2024-01-10',
+         end_date: '2024-01-17',
+       });
+     }).toThrow('[ERROR] 잘못된 입력입니다. 다시 입력해 주세요.');
+     ```
+
+2. **구매 수량 0 요청 처리**
+
+   - **목적**: `getAvailableQuantity` 메소드 호출 시 구매 수량이 0인 경우, 예외 발생 테스트
+   - **테스트 예시**:
+     ```javascript
+     const promotion = new Promotion({
+       name: '탄산2+1',
+       type: 'TWO_PLUS_ONE',
+       quantity: 10,
+     });
+     expect(() => promotion.getAvailableQuantity(0)).toThrow(
+       '[ERROR] 잘못된 입력입니다. 다시 입력해 주세요.'
+     );
+     ```
+
+3. **프로모션 기간 외의 요청 처리**
+
+   - **목적**: 현재 일자가 프로모션 기간 범위에 포함되지 않는 경우, `getAvailableQuantity` 메소드가 0을 반환하는지 테스트
+   - **테스트 예시**:
+     ```javascript
+     const promotion = new Promotion({
+       name: '탄산2+1',
+       type: 'TWO_PLUS_ONE',
+       quantity: 10,
+       start_date: '2024-01-10',
+       end_date: '2024-01-17',
+     });
+     const result = promotion.getAvailableQuantity(3);
+     expect(result).toEqual({ quantity: 0, violation: null });
+     ```
+
+4. **프로모션 타입이 null일 때 0 반환**
+
+   - **목적**: `type`이 `null`인 경우, `getAvailableQuantity` 메소드가 항상 0을 반환하는지 테스트
+   - **테스트 예시**:
+     ```javascript
+     const promotion = new Promotion({ name: '', type: null, quantity: 10 });
+     const result = promotion.getAvailableQuantity(10);
+     expect(result).toEqual({ quantity: 0, violation: null, freebieCount: 0 });
+     ```
+
+5. **재고 감소 처리**
+
+   - **목적**: `decrease()` 메소드를 통해 프로모션 재고 수량을 정확히 감소시키는지 테스트
+   - **테스트 예시**:
+     ```javascript
+     const promotion = new Promotion({
+       name: '탄산2+1',
+       type: 'TWO_PLUS_ONE',
+       quantity: 10,
+     });
+     promotion.decrease(3);
+     expect(promotion.summary).toEqual({ name: '탄산2+1', quantity: 7 });
+     ```
+
+6. **재고 초과 감소 요청 처리**
+
+   - **목적**: `decrease()` 호출 시 현재 재고 수량을 초과하는 감소 요청이 들어온 경우, 예외를 발생시키는지 테스트
+   - **테스트 예시**:
+     ```javascript
+     const promotion = new Promotion({
+       name: '탄산2+1',
+       type: 'TWO_PLUS_ONE',
+       quantity: 10,
+     });
+     expect(() => promotion.decrease(11)).toThrow(
+       '[ERROR] 재고 수량을 초과하여 구매할 수 없습니다. 다시 입력해 주세요.'
+     );
+     ```
+
+7. **프로모션 재고 조회**
+   - **목적**: `summary` 프로퍼티를 통해 현재 프로모션 재고 정보를 정확히 반환하는지 테스트
+   - **테스트 예시**:
+     ```javascript
+     const promotion = new Promotion({
+       name: '탄산2+1',
+       type: 'TWO_PLUS_ONE',
+       quantity: 10,
+     });
+     expect(promotion.summary).toEqual({ name: '탄산2+1', quantity: 10 });
+     ```
+
 #### Cart 클래스
 
 1. **잘못된 입력 형식 처리**
