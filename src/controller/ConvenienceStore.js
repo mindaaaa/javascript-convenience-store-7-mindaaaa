@@ -1,4 +1,4 @@
-import { PromotionViolation } from '../utils/constants.js';
+import { PromotionViolation, MESSAGES } from '../utils/constants.js';
 import Cart from '../domain/Cart.js';
 import Cashier from '../domain/Cashier.js';
 
@@ -25,17 +25,9 @@ class ConvenienceStore {
   }
 
   async #startStep() {
-    const greeting = [
-      `안녕하세요. W편의점입니다.`,
-      `현재 보유하고 있는 상품입니다.`,
-      ``,
-      this.#shelf.toString(),
-      ``,
-    ];
-    this.#std.write(greeting.join('\n'));
-    return this.#std.readLine(
-      '구매하실 상품명과 수량을 입력해 주세요. (예: [사이다-2],[감자칩-1])\n'
-    );
+    const greeting = [MESSAGES.GREETING, this.#shelf.toString(), ''].join('\n');
+    this.#std.write(greeting);
+    return this.#std.readLine(MESSAGES.PROMPT_PRODUCT_INPUT);
   }
 
   async #selectGoodsStep(goodsInput) {
@@ -77,7 +69,7 @@ class ConvenienceStore {
 
   async #handleOneMoreViolation(summary) {
     const yesOrNo = await this.#std.yesOrNo(
-      `\n현재 ${summary.name}은(는) ${summary.violation.quantity}개를 무료로 더 받을 수 있습니다. 추가하시겠습니까? (Y/N)\n`
+      MESSAGES.PROMPT_ONE_MORE(summary.name, summary.violation.quantity)
     );
 
     if (yesOrNo === 'Y') {
@@ -89,7 +81,7 @@ class ConvenienceStore {
 
   async #handleOutOfStockViolation(summary) {
     const yesOrNo = await this.#std.yesOrNo(
-      `\n현재 ${summary.name} ${summary.violation.quantity}개는 프로모션 할인이 적용되지 않습니다. 그래도 구매하시겠습니까? (Y/N)\n`
+      MESSAGES.PROMPT_OUT_OF_STOCK(summary.name, summary.violation.quantity)
     );
     if (yesOrNo === 'Y') {
       return this.#confirmPlan(summary);
@@ -145,7 +137,7 @@ class ConvenienceStore {
 
   async #shouldDiscount() {
     const yesOrNo = await this.#std.yesOrNo(
-      '\n멤버십 할인을 받으시겠습니까? (Y/N)\n'
+      MESSAGES.PROMPT_MEMBERSHIP_DISCOUNT
     );
 
     return yesOrNo === 'Y';
@@ -154,9 +146,7 @@ class ConvenienceStore {
   async #endStep(receipt) {
     this.#std.write(`\n${receipt.toString()}`);
 
-    const yesOrNo = await this.#std.yesOrNo(
-      '감사합니다. 구매하고 싶은 다른 상품이 있나요? (Y/N)\n'
-    );
+    const yesOrNo = await this.#std.yesOrNo(MESSAGES.THANK_YOU_MESSAGE);
     this.#std.write('\n');
     const shouldEnd = yesOrNo === 'N';
 
