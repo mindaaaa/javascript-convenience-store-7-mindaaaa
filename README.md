@@ -991,3 +991,11 @@ async #checkoutStep(confirmedPlans) {
        '[ERROR] 재고 수량을 초과하여 구매할 수 없습니다. 다시 입력해 주세요.'
      );
      ```
+
+### 실행 방법
+
+다음 명령어로 실행할 수 있습니다.
+
+```bash
+npm test
+```
