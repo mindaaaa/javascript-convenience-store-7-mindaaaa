@@ -551,7 +551,25 @@ const receipt = new Receipt(priceSum, countSum, data, discountByMembership);
 내실돈                   9,000
 ```
 
-###
+### Shelves 클래스
+
+- 편의점 제품 및 프로모션 관련 데이터 관리
+  - 제품의 가격, 재고 수량, 프로모션 정보를 담음
+  - 결제와 관련된 정보를 제공할 수 있음
+
+```javascript
+new Shelves(products, promotions);
+```
+
+- `prducts`는 `name`, `price`, `quantity`, `promotion` 키를 포함
+- `promotions`는 `name`, `type`, `start_date`, `end_date` 키를 포함
+
+#### 주요 메서드
+
+- `tryFetchGoods(goodsName, regularQuantity, promotionalQuantity)`: 재고를 확인하고 요청 수량만큼 감소
+
+- `summary`: 제품 정보를 요약해 반환
+- `toString()`: 제품 정보와 재고 상황을 **문자열**로 반환
 
 ## 📄 테스트(Testing)
 
