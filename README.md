@@ -729,3 +729,113 @@ async #checkoutStep(confirmedPlans) {
      ```javascript
      new Cart('[콜라-10],[콜라-10]'); // [ERROR] 올바르지 않은 형식으로 입력했습니다. 다시 입력해 주세요.
      ```
+
+#### Inventory 클래스
+
+1. **재고 감소 처리**
+
+   - **목적**: `decrease()` 메소드를 호출하여 일반 재고와 프로모션 재고를 정확히 감소시키는지 테스트
+   - **테스트 예시**:
+
+     ```javascript
+     const goods = createGoods(999, 10);
+     goods.decrease(42, 3);
+
+     expect(goods.summary).toEqual({
+       name: '콜라',
+       price: 1000,
+       quantity: 957,
+       promotion: {
+         name: '탄산2+1',
+         quantity: 7,
+       },
+     });
+     ```
+
+2. **재고 초과 요청 처리**
+
+   - **목적**: 현재 재고보다 많은 수량을 감소하려는 경우, 예외를 발생시키는지 테스트
+   - **테스트 예시**:
+
+     ```javascript
+     const goods = createGoods(10, 5);
+
+     expect(() => {
+       goods.decrease(20, 0);
+     }).toThrow(
+       '[ERROR] 재고 수량을 초과하여 구매할 수 없습니다. 다시 입력해 주세요.'
+     );
+     ```
+
+3. **현재 재고 조회**
+
+   - **목적**: `summary` 속성을 통해 현재 재고 정보를 정확히 반환하는지 테스트
+   - **테스트 예시**:
+
+     ```javascript
+     const goods = createGoods(999, 10);
+     const result = goods.summary;
+
+     expect(result).toEqual({
+       name: '콜라',
+       price: 1000,
+       quantity: 999,
+       promotion: {
+         name: '탄산2+1',
+         quantity: 10,
+       },
+     });
+     ```
+
+4. **2+1 프로모션 적용**
+
+   - **목적**: 2+1 프로모션이 적용된 제품에 대해 프로모션 조건이 올바르게 반영되는지 테스트
+   - **테스트 예시**:
+
+     ```javascript
+     const goods = createGoods();
+
+     // 모든 혜택 적용 가능
+     let paymentSummary = goods.getPaymentSummary(6);
+     expect(paymentSummary.quantity.regular).toBe(0);
+     expect(paymentSummary.quantity.promotional).toBe(6);
+
+     // 일부 혜택만 적용
+     paymentSummary = goods.getPaymentSummary(4);
+     expect(paymentSummary.quantity.regular).toBe(1);
+     expect(paymentSummary.quantity.promotional).toBe(3);
+
+     // 프로모션 재고 부족으로 violation 발생
+     goods.decrease(0, 7); // 프로모션 재고 감소
+     paymentSummary = goods.getPaymentSummary(5);
+     expect(paymentSummary.violation.type).toBe(
+       PromotionViolation.OUT_OF_STOCK
+     );
+     ```
+
+5. **1+1 프로모션 적용**
+
+   - **목적**: 1+1 프로모션이 적용된 제품에 대해 프로모션 조건이 올바르게 반영되는지 테스트
+   - **테스트 예시**:
+
+     ```javascript
+     const goods = createGoods();
+
+     // 모든 혜택 적용 가능
+     let paymentSummary = goods.getPaymentSummary(4);
+     expect(paymentSummary.quantity.regular).toBe(0);
+     expect(paymentSummary.quantity.promotional).toBe(4);
+
+     // 일부 혜택만 적용 가능
+     paymentSummary = goods.getPaymentSummary(5);
+     expect(paymentSummary.quantity.regular).toBe(1);
+     expect(paymentSummary.quantity.promotional).toBe(4);
+     expect(paymentSummary.violation.type).toBe(PromotionViolation.ONE_MORE);
+
+     // 프로모션 재고 및 일반 재고 부족으로 예외 발생
+     expect(() => {
+       goods.getPaymentSummary(1000);
+     }).toThrow(
+       '[ERROR] 재고 수량을 초과하여 구매할 수 없습니다. 다시 입력해 주세요.'
+     );
+     ```
