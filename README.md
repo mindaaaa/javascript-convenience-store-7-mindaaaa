@@ -434,7 +434,7 @@ new Shelves(products, promotions);
 ```javascript
 try {
   const cart = new Cart('[사이다-2],[감자칩-1]');
-  Console.print(cart.goods); // 출력되는거 보여주면 좋음
+  Console.print(cart.goods); // [ { name: '사이다', quantity: 2 }, { name: '감자칩', quantity: 1 }]
 } catch (error) {
   console.error(error.message);
 }
@@ -596,7 +596,79 @@ const receipt = new Receipt(priceSum, countSum, data, discountByMembership);
 
 ### Controller
 
-- 스텝별 기능을 간략히 설명한다\*\*\*
+1. `#startStep()`
+
+- 편의점 서비스 시작 시 인사말과 상품 목록을 표시
+- 구매할 상품과 수량을 입력
+
+```javascript
+async #startStep() {
+  const greeting = [MESSAGES.GREETING, this.#shelf.toString(), ''].join('\n');
+  this.#std.write(greeting);
+  return this.#std.readLine(MESSAGES.PROMPT_PRODUCT_INPUT);
+}
+```
+
+2. `#selectGoodsStep(goodsInput)`
+
+- 사용자가 입력한 상품 목록을 기반으로 Cart 객체를 생성
+- 구매 계획 초안을 작성
+
+```javascript
+async #selectGoodsStep(goodsInput) {
+    let currentInput = goodsInput;
+    while (true) {
+        try {
+            const shoppingCart = new Cart(currentInput);
+            return this.#paymentPlanner.createPaymentPlan(shoppingCart);
+        } catch (e) {
+            this.#std.write(e.message);
+            currentInput = await this.#std.readLine(`\n`);
+        }
+    }
+}
+```
+
+3. `#postSelectGoodsStep(paymentSummaries)`
+
+- 구매 계획 초안을 점검
+- 추가 구매 및 재고 프로모션 상황에 따라 최종 구매 계획을 작성합니다.
+
+```javascript
+async #postSelectGoodsStep(paymentSummaries) {
+    const confirmedPlans = [];
+
+    for (const summary of paymentSummaries) {
+        if (summary.violation.type) {
+            const plan = await this.#handleViolatedPurchase(summary);
+            confirmedPlans.push(plan);
+        } else {
+            const plan = this.#confirmPlan(summary);
+            confirmedPlans.push(plan);
+        }
+    }
+
+    return confirmedPlans;
+}
+```
+
+4. `#checkoutStep(confirmedPlans)`
+
+- 최종 구매를 바탕으로 결제 진행
+- 재고를 차감
+
+```javascript
+async #checkoutStep(confirmedPlans) {
+    const shouldDiscount = await this.#shouldDiscount();
+    const result = this.#cashier.checkout(confirmedPlans, shouldDiscount);
+
+    for (const plan of confirmedPlans) {
+        this.#shelf.tryFetchGoods(plan.name, plan.quantity.regular, plan.quantity.promotional);
+    }
+
+    return result;
+}
+```
 
 ## 📄 테스트(Testing)
 
