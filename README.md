@@ -343,7 +343,93 @@ N
 
 ###### 모듈 구조
 
-###
+### Cart 클래스
+
+- 사용자가 **입력한 상품명과 수량**을 바탕으로 장바구니 항목 생성
+  - 유효성 검증
+  - 중복된 상품 예외처리
+  - 장바구니 목록을 `goods`로 제공
+
+```javascript
+  constructor(userInput) {
+    this.#validateUserInputFormat(userInput);
+    const parsedList = this.#parseInputToList(userInput);
+
+    this.#items = this.#removeDuplicateItems(parsedList);
+  }
+```
+
+- `#validateUserInputFormat(userInput)`
+  - 입력 형식이 정규표현식 패턴에 맞는지 검증
+- `#parseInputToList(userInput)`
+  - 입력 문자열을 분리해 각 항목으로 변환
+  - `{name, quantity}` 형식으로 객체 벼앨 반환
+- `#parseSingleItem(item)`
+  - 단일 상품 항목을 `{name, quantity}` 형식으로 파싱
+- `#removeDuplicateItems(parsedList)`
+  - 중복된 상품인경우 예외처리
+- `get goods`
+  - 장바구니에 추가된 상품 목록 반환
+  - `[{ name, quantity }]`
+
+#### 사용 예시
+
+```javascript
+try {
+  const cart = new Cart('[사이다-2],[감자칩-1]');
+  Console.print(cart.goods);
+} catch (error) {
+  console.error(error.message);
+}
+```
+
+### Cashier 클래스
+
+- 영수증을 생성하는 역할
+  - 결제에 필요한 각종 계산을 수행한다.
+  - 할인을 반영해 `Receipt` 인스턴스를 반환한다.
+
+```javascript
+  checkout(confirmedPlans, shouldDiscount) {
+    const results = confirmedPlans.map((plan) => this.#processPlan(plan));
+    const sumOfPrice = this.#calculateTotalPrice(results);
+    const goodsCount = this.#calculateTotalCount(results);
+    const discountByMembership = this.#calculateDiscountByMembership(
+      results,
+      shouldDiscount
+    );
+
+    return new Receipt(sumOfPrice, goodsCount, results, discountByMembership);
+  }
+```
+
+`confirmedPlans`를 바탕으로 전체 결제 금액을 계산하고 **영수증을 생성**한다.
+
+#### 사용 예시
+
+```javascript
+const cashier = new Cashier(8000, 0.3);
+
+const confirmedPlans = [
+  {
+    name: '콜라',
+    price: 1000,
+    requestedQuantity: 6,
+    freebieCount: 2,
+    quantity: { regular: 0, promotional: 6 },
+  },
+  {
+    name: '사이다',
+    price: 1000,
+    requestedQuantity: 4,
+    freebieCount: 1,
+    quantity: { regular: 3, promotional: 1 },
+  },
+];
+
+const shouldDiscount = true;
+const receipt = cashier.checkout(confirmedPlans, shouldDiscount);
+```
 
 ###
 
