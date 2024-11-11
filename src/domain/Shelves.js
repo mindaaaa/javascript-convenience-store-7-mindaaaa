@@ -1,8 +1,6 @@
 import {
   ERROR_MESSAGES,
   PromotionType,
-  NEW_LINE,
-  TAB,
   PROMOTION,
   RECEIPT,
 } from '../utils/constants.js';
@@ -68,9 +66,9 @@ class Shelves {
   }
 
   #getPromotionType(name) {
-    if (name === '탄산2+1') return PromotionType.TWO_PLUS_ONE;
-    if (name === 'MD추천상품') return PromotionType.MD_RECOMMEND;
-    if (name === '반짝할인') return PromotionType.TIME_SALE;
+    if (name === PROMOTION.TWO_PLUS_ONE) return PromotionType.TWO_PLUS_ONE;
+    if (name === PROMOTION.MD_RECOMMEND) return PromotionType.MD_RECOMMEND;
+    if (name === PROMOTION.TIME_SALE) return PromotionType.TIME_SALE;
     return PromotionType.NONE;
   }
 
@@ -128,7 +126,10 @@ class Shelves {
   }
 
   #formatQuantity(quantity) {
-    return quantity ? `${quantity}개` : '재고 없음';
+    if (quantity) {
+      return `${quantity}${RECEIPT.UNIT}`;
+    }
+    return RECEIPT.STOCK_UNAVAILABLE;
   }
 
   get goods() {

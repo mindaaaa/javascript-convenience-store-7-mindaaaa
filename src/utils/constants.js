@@ -34,18 +34,15 @@ export const RECEIPT = {
   PROMOTION_DISCOUNT: '행사할인\t\t-',
   MEMBERSHIP_DISCOUNT: '멤버십할인\t\t-',
   FINAL_AMOUNT: '내실돈\t\t\t',
+  STOCK_UNAVAILABLE: '재고 없음',
+  UNIT: '개',
 };
 
 export const NEW_LINE = '\n';
 export const TAB = '\t';
 
-export const PROMOTION_NAMES = {
-  CARBONATED_TWO_PLUS_ONE: '탄산2+1',
+export const PROMOTION = {
+  TWO_PLUS_ONE: '탄산2+1',
   MD_RECOMMEND: 'MD추천상품',
   TIME_SALE: '반짝할인',
-};
-
-export const RECEIPT_LABELS = {
-  STOCK_UNAVAILABLE: '재고 없음',
-  UNIT: '개',
 };
