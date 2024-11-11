@@ -431,7 +431,38 @@ const shouldDiscount = true;
 const receipt = cashier.checkout(confirmedPlans, shouldDiscount);
 ```
 
-###
+### Inventory 클래스
+
+- 편의점 상품의 재고와 프로모션 상태 관리 및 결제 정보 제공
+  - 상품 결제 정보 제공: 사용자의 요청에 따라 **결제 요약 정보** 생성
+  - 재고 감소: 구매를 확정한 경우 **상품 수량 감소**
+  - 프로모션 상태 관리: 상품의 프로모션 정보를 확인하고 부합 여부 검사
+
+```javascript
+  constructor(data, promotion) {
+    this.#initializeData(data);
+    this.#promotion = new Promotion(promotion);
+  }
+
+  getPaymentSummary(requestedQuantity) {
+    this.#validateStock(requestedQuantity);
+    const { promotionalQuantity, freebieCount, violation } =
+      this.#calculatePromotions(requestedQuantity);
+    const regularQuantity = requestedQuantity - promotionalQuantity;
+    return this.#createPaymentSummary(
+      requestedQuantity,
+      regularQuantity,
+      promotionalQuantity,
+      freebieCount,
+      violation
+    );
+  }
+```
+
+- `생성자`: 상품의 이름, 가격, 초기 수량, 프로모션 정보 초기화
+- `getPaymentSummary(requestedQuantity)`: 사용자의 요청을 기준으로 *프로모션 조건과 적용 가능한 무료 상품 수량 계산*을 통해 결제 요약 정보 반환
+- `decrease(regularQuantity, promotionalQuantity)`: 최종 구매 결정에서 **재고 업데이트**
+- `summary`: 상품 이름, 가격, 잔여 재고 정보 반환
 
 ###
 
