@@ -571,6 +571,32 @@ new Shelves(products, promotions);
 - `summary`: 제품 정보를 요약해 반환
 - `toString()`: 제품 정보와 재고 상황을 **문자열**로 반환
 
+### Checkout 클래스
+
+- 사용자가 장바구니에 담은 목록을 바탕으로 **결제 계획과 요약 정보 생성**
+- `Shelves` 객체를 기반으로 상품 정보 확인 및 결제 요약 정보 반환
+
+```javascript
+constructor(shelves); // 재고 정보를 담고 있음
+```
+
+#### 주요 메서드
+
+- `createPaymentPlan(shoppingCart)`: 장바구니를 바탕으로 결제 요약 생성 및 결제 계획 반환
+- `createPaymentSummary(name, quantity)`: *특정 상품*에 대한 결제 요약 생성
+
+#### 사용 예시
+
+```javascript
+import Checkout from './Checkout.js';
+import Shelves from './Shelves.js';
+
+const shelves = new Shelves(productList, promotionList);
+const checkout = new Checkout(shelves);
+
+const paymentPlan = checkout.createPaymentPlan(cart);
+```
+
 ## 📄 테스트(Testing)
 
 - 단위 테스트(Unit Testing)를 통해 예외 상황과 함수 동작을 검증했습니다.

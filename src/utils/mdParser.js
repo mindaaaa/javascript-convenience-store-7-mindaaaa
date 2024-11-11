@@ -18,24 +18,38 @@ const Strategy = {
 
 class MdFileReader {
   read(filePath) {
-    const file = readFileSync(filePath, 'utf8');
-    const lines = file.split('\n').filter((e) => e);
+    const file = this.#readFile(filePath);
+    const [headers, ...rows] = this.#parseLines(file);
 
-    const [headers, ...restRows] = lines.map((line) => {
-      return line.split(',').map((value) => value.trim());
-    });
+    return this.#parseRows(headers, rows);
+  }
 
-    const parsedData = restRows.map((values) => {
-      return headers.reduce((obj, header, index) => {
-        const currStrategy = Strategy[header];
+  #readFile(filePath) {
+    return readFileSync(filePath, 'utf8');
+  }
 
-        obj[header] = currStrategy(values[index]);
+  #parseLines(file) {
+    const lines = file.split('\n').filter((line) => line);
+    return lines.map((line) => line.split(',').map((value) => value.trim()));
+  }
 
-        return obj;
-      }, {});
-    });
+  #parseRows(headers, rows) {
+    return rows.map((values) => this.#mapRowToHeaders(headers, values));
+  }
 
-    return parsedData;
+  #mapRowToHeaders(headers, values) {
+    return headers.reduce((obj, header, index) => {
+      obj[header] = this.#applyStrategy(header, values[index]);
+      return obj;
+    }, {});
+  }
+
+  #applyStrategy(header, value) {
+    const strategy = Strategy[header];
+    if (strategy) {
+      return strategy(value);
+    }
+    return value;
   }
 }
 
