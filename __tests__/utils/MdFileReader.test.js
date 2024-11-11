@@ -1,4 +1,4 @@
-import MdFileReader from '../../src/utils/MdParser.js';
+import MdFileReader from '../../src/utils/MdFileReader.js';
 import { Console } from '@woowacourse/mission-utils';
 
 describe.skip('md 파일을 읽어와 객체배열로 반환한다.', () => {
