@@ -23,3 +23,5 @@ class Checkout {
     return targetGoods.getPaymentSummary(quantity);
   }
 }
+
+export default Checkout;
