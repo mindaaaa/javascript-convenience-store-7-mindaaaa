@@ -677,7 +677,7 @@ async #checkoutStep(confirmedPlans) {
 
 ### 주요 테스트 기능
 
-### Promotion 클래스
+#### Promotion 클래스
 
 1. **유효하지 않은 프로모션 타입 처리**
 
@@ -776,6 +776,57 @@ async #checkoutStep(confirmedPlans) {
        quantity: 10,
      });
      expect(promotion.summary).toEqual({ name: '탄산2+1', quantity: 10 });
+     ```
+
+#### Shelves 클래스
+
+### Shelves 클래스 주요 테스트 기능
+
+1. **인스턴스화 및 정보 확인**
+
+   - **목적**: `Shelves` 클래스가 정상적으로 인스턴스화되었을 때 `summary` 프로퍼티를 통해 상품 목록과 프로모션 정보를 확인할 수 있는지 테스트
+   - **테스트 예시**:
+     ```javascript
+     const shelves = new Shelves(products, promotions);
+     expect(shelves.summary).toEqual([
+       {
+         name: '콜라',
+         price: 1000,
+         quantity: 10,
+         promotion: { name: '탄산2+1', quantity: 10 },
+       },
+       // ... 기타 상품들
+     ]);
+     ```
+
+2. **재고 감소 처리**
+
+   - **목적**: `tryFetchGoods()` 메소드를 호출하여 특정 제품의 일반 및 프로모션 재고를 정확히 감소시키는지 테스트
+   - **테스트 예시**:
+     ```javascript
+     const shelves = new Shelves(products, promotions);
+     const result = shelves.tryFetchGoods('탄산수', 0, 3);
+     expect(result).toEqual({
+       name: '탄산수',
+       quantity: {
+         regular: 0,
+         promotional: 3,
+       },
+     });
+     ```
+
+3. **재고 정보 확인 (toString 메소드)**
+   - **목적**: `toString()` 메소드를 호출하여 진열된 모든 상품의 재고 상태를 문자열 형태로 확인할 수 있는지 테스트
+   - **테스트 예시**:
+     ```javascript
+     const shelves = new Shelves(products, promotions);
+     const result = shelves.toString();
+     expect(result).toBe(`- 콜라 1,000원 10개 탄산2+1
+     - 콜라 1,000원 10개
+     - 사이다 1,000원 8개 탄산2+1
+     // ... 기타 상품들
+     - 컵라면 1,700원 1개 MD추천상품
+     - 컵라면 1,700원 10개`);
      ```
 
 #### Cart 클래스
