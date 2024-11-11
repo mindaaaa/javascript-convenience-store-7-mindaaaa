@@ -1,5 +1,5 @@
 import { DateTimes } from '@woowacourse/mission-utils';
-import { PromotionType } from '../utils/constants';
+import { PromotionType } from '../utils/constants.js';
 import PromotionStrategy from './strategy/index.js';
 
 class Promotion {

@@ -1,5 +1,5 @@
 import Promotion from './Promotion.js';
-import { PromotionViolation } from '../utils/constants';
+import { PromotionViolation } from '../utils/constants.js';
 
 class Inventory {
   #name;

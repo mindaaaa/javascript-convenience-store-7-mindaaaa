@@ -1,4 +1,4 @@
-import { PromotionViolation } from '../../utils/constants';
+import { PromotionViolation } from '../../utils/constants.js';
 
 class NBuyGetOnePromotion {
   #Unit;
