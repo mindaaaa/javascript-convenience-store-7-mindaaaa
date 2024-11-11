@@ -4,7 +4,7 @@
 
 ## 🎮 실행 결과 예시
 
-![편의점 실행 결과 예시]()
+![편의점 실행 결과 예시](img/program.png)
 
 # 🚀 기능 요구 사항
 
@@ -339,9 +339,66 @@ N
 
 ## 🛠️ 구현 상세
 
-###
+### Promotion 클래스
 
-###### 모듈 구조
+- 특정 상품의 **프로모션 정보 관리**
+  - 재고 관리 포함
+  - 요청 수량에 프로모션 혜택 적용을 도움
+
+##### 주요 기능
+
+- 프로모션 생성: 상품의 이름, 유형, 수량, 프로모션 기간으로 초기화
+- 유효성 검사: 프로모션의 만료 여부를 검사
+- 프로모션 혜택 계산: 프로모션 혜택 적용 가능 수량을 판단하고, 위반 사항을 계산
+- 프로모션 재고 감소: 프로모션 적용 시 소모되는 재고 관리
+
+#### DateRange 클래스
+
+- `Promotion` 클래스의 프로모션 기간과 관련된 날짜 처리 로직
+
+##### 주요 기능
+
+- 날짜 범위 설정: 시작과 종료일을 기반으로 객체 초기화
+- 유효성 검사: 날짜가 범위 내에 들어있는지 확인
+
+##### 사용 예시
+
+```javascript
+const promoDateRange = new DateRange('2024-01-01', '2024-12-31');
+```
+
+```javascript
+const promotionData = {
+  name: '탄산2+1',
+  type: PromotionType.TWO_PLUS_ONE,
+  quantity: 10,
+  start_date: '2024-01-01',
+  end_date: '2024-12-31',
+};
+
+const promotion = new Promotion(promotionData);
+const availableQuantity = promotion.getAvailableQuantity(3); // 수량에 따른 혜택 제공
+```
+
+### Shelves 클래스
+
+- 편의점 제품 및 프로모션 관련 데이터 관리
+  - 제품의 가격, 재고 수량, 프로모션 정보를 담음
+  - 결제와 관련된 정보를 제공할 수 있음
+
+```javascript
+new Shelves(products, promotions);
+```
+
+- `prducts`는 `name`, `price`, `quantity`, `promotion` 키를 포함
+- `promotions`는 `name`, `type`, `start_date`, `end_date` 키를 포함
+
+#### 주요 메서드
+
+- `tryFetchGoods(goodsName, regularQuantity, promotionalQuantity)`: 재고를 확인하고 요청 수량만큼 감소
+
+- `summary`: 제품 정보를 요약해 반환
+- `toString()`: 제품 정보와 재고 상황을 **문자열**로 반환
 
 ### Cart 클래스
 
@@ -363,7 +420,7 @@ N
   - 입력 형식이 정규표현식 패턴에 맞는지 검증
 - `#parseInputToList(userInput)`
   - 입력 문자열을 분리해 각 항목으로 변환
-  - `{name, quantity}` 형식으로 객체 벼앨 반환
+  - `{name, quantity}` 형식으로 객체 배열 반환
 - `#parseSingleItem(item)`
   - 단일 상품 항목을 `{name, quantity}` 형식으로 파싱
 - `#removeDuplicateItems(parsedList)`
@@ -377,10 +434,69 @@ N
 ```javascript
 try {
   const cart = new Cart('[사이다-2],[감자칩-1]');
-  Console.print(cart.goods);
+  Console.print(cart.goods); // 출력되는거 보여주면 좋음
 } catch (error) {
   console.error(error.message);
 }
+```
+
+### Inventory 클래스
+
+- 편의점 상품의 재고와 프로모션 상태 관리 및 결제 정보 제공
+  - 상품 결제 정보 제공: 사용자의 요청에 따라 **결제 요약 정보** 생성
+  - 재고 감소: 구매를 확정한 경우 **상품 수량 감소**
+  - 프로모션 상태 관리: 상품의 프로모션 정보를 확인하고 부합 여부 검사
+
+```javascript
+  constructor(data, promotion) {
+    this.#initializeData(data);
+    this.#promotion = new Promotion(promotion);
+  }
+
+  getPaymentSummary(requestedQuantity) {
+    this.#validateStock(requestedQuantity);
+    const { promotionalQuantity, freebieCount, violation } =
+      this.#calculatePromotions(requestedQuantity);
+    const regularQuantity = requestedQuantity - promotionalQuantity;
+    return this.#createPaymentSummary(
+      requestedQuantity,
+      regularQuantity,
+      promotionalQuantity,
+      freebieCount,
+      violation
+    );
+  }
+```
+
+- `생성자`: 상품의 이름, 가격, 초기 수량, 프로모션 정보 초기화
+- `getPaymentSummary(requestedQuantity)`: 사용자의 요청을 기준으로 *프로모션 조건과 적용 가능한 무료 상품 수량 계산*을 통해 결제 요약 정보 반환
+- `decrease(regularQuantity, promotionalQuantity)`: 최종 구매 결정에서 **재고 업데이트**
+- `summary`: 상품 이름, 가격, 잔여 재고 정보 반환
+
+### Checkout 클래스
+
+- 사용자가 장바구니에 담은 목록을 바탕으로 **결제 계획과 요약 정보 생성**
+- `Shelves` 객체를 기반으로 상품 정보 확인 및 결제 요약 정보 반환
+
+```javascript
+constructor(shelves); // 재고 정보를 담고 있음
+```
+
+#### 주요 메서드
+
+- `createPaymentPlan(shoppingCart)`: 장바구니를 바탕으로 결제 요약을 생성
+- `createPaymentSummary(name, quantity)`: *특정 상품*에 대한 결제 요약 생성
+
+#### 사용 예시
+
+```javascript
+import Checkout from './Checkout.js';
+import Shelves from './Shelves.js';
+
+const shelves = new Shelves(productList, promotionList);
+const checkout = new Checkout(shelves);
+
+const paymentPlan = checkout.createPaymentPlan(cart);
 ```
 
 ### Cashier 클래스
@@ -431,80 +547,6 @@ const shouldDiscount = true;
 const receipt = cashier.checkout(confirmedPlans, shouldDiscount);
 ```
 
-### Inventory 클래스
-
-- 편의점 상품의 재고와 프로모션 상태 관리 및 결제 정보 제공
-  - 상품 결제 정보 제공: 사용자의 요청에 따라 **결제 요약 정보** 생성
-  - 재고 감소: 구매를 확정한 경우 **상품 수량 감소**
-  - 프로모션 상태 관리: 상품의 프로모션 정보를 확인하고 부합 여부 검사
-
-```javascript
-  constructor(data, promotion) {
-    this.#initializeData(data);
-    this.#promotion = new Promotion(promotion);
-  }
-
-  getPaymentSummary(requestedQuantity) {
-    this.#validateStock(requestedQuantity);
-    const { promotionalQuantity, freebieCount, violation } =
-      this.#calculatePromotions(requestedQuantity);
-    const regularQuantity = requestedQuantity - promotionalQuantity;
-    return this.#createPaymentSummary(
-      requestedQuantity,
-      regularQuantity,
-      promotionalQuantity,
-      freebieCount,
-      violation
-    );
-  }
-```
-
-- `생성자`: 상품의 이름, 가격, 초기 수량, 프로모션 정보 초기화
-- `getPaymentSummary(requestedQuantity)`: 사용자의 요청을 기준으로 *프로모션 조건과 적용 가능한 무료 상품 수량 계산*을 통해 결제 요약 정보 반환
-- `decrease(regularQuantity, promotionalQuantity)`: 최종 구매 결정에서 **재고 업데이트**
-- `summary`: 상품 이름, 가격, 잔여 재고 정보 반환
-
-### Promotion 클래스
-
-- 특정 상품의 **프로모션 정보 관리**
-  - 재고 관리 포함
-  - 요청 수량에 프로모션 혜택 적용을 도움
-
-#### 주요 기능
-
-- 프로모션 생성: 상품의 이름, 유형, 수량, 프로모션 기간으로 초기화
-- 유효성 검사: 프로모션이 만료 여부를 검사
-- 프로모션 혜택 계산: 프로모션 혜택 적용 가능 수량을 판단하고, 위반 사항을 계산
-- 프로모션 재고 감소: 프로모션 적용 시 소모되는 재고 관리
-
-#### DateRange 클래스
-
-- `Promotion` 클래스의 프로모션 기간과 관련된 날짜 처리 로직
-
-#### 주요 기능
-
-- 날짜 범위 설정: 시작과 종료일을 기반으로 객체 초기화
-- 유효성 검사: 날짜가 범위 내에 들어있는지 확인
-
-#### 사용 예시
-
-```javascript
-const promoDateRange = new DateRange('2024-01-01', '2024-12-31');
-```
-
-```javascript
-const promotionData = {
-  name: '탄산2+1',
-  type: PromotionType.TWO_PLUS_ONE,
-  quantity: 10,
-  start_date: '2024-01-01',
-  end_date: '2024-12-31',
-};
-
-const promotion = new Promotion(promotionData);
-const availableQuantity = promotion.getAvailableQuantity(3); // 수량에 따른 혜택 제공
-```
-
 ### Receipt 클래스
 
 - 결제 정보를 기반으로 **영수증 생성**
@@ -514,6 +556,7 @@ const availableQuantity = promotion.getAvailableQuantity(3); // 수량에 따른
 
 - 영수증 생성
 - 할인 계산: 행사 및 멤버십 할인을 계산해 **최종 결제 금액 반영**
+- toString() 메서드를 제공
 
 ```javascript
 constructor(price, count, data, discountByMembership);
@@ -535,7 +578,7 @@ const data = [
 const receipt = new Receipt(priceSum, countSum, data, discountByMembership);
 ```
 
-#### 출력
+### toString() 예시
 
 ```bash
 ===========W 편의점============
@@ -551,51 +594,9 @@ const receipt = new Receipt(priceSum, countSum, data, discountByMembership);
 내실돈                   9,000
 ```
 
-### Shelves 클래스
+### Controller
 
-- 편의점 제품 및 프로모션 관련 데이터 관리
-  - 제품의 가격, 재고 수량, 프로모션 정보를 담음
-  - 결제와 관련된 정보를 제공할 수 있음
-
-```javascript
-new Shelves(products, promotions);
-```
-
-- `prducts`는 `name`, `price`, `quantity`, `promotion` 키를 포함
-- `promotions`는 `name`, `type`, `start_date`, `end_date` 키를 포함
-
-#### 주요 메서드
-
-- `tryFetchGoods(goodsName, regularQuantity, promotionalQuantity)`: 재고를 확인하고 요청 수량만큼 감소
-
-- `summary`: 제품 정보를 요약해 반환
-- `toString()`: 제품 정보와 재고 상황을 **문자열**로 반환
-
-### Checkout 클래스
-
-- 사용자가 장바구니에 담은 목록을 바탕으로 **결제 계획과 요약 정보 생성**
-- `Shelves` 객체를 기반으로 상품 정보 확인 및 결제 요약 정보 반환
-
-```javascript
-constructor(shelves); // 재고 정보를 담고 있음
-```
-
-#### 주요 메서드
-
-- `createPaymentPlan(shoppingCart)`: 장바구니를 바탕으로 결제 요약 생성 및 결제 계획 반환
-- `createPaymentSummary(name, quantity)`: *특정 상품*에 대한 결제 요약 생성
-
-#### 사용 예시
-
-```javascript
-import Checkout from './Checkout.js';
-import Shelves from './Shelves.js';
-
-const shelves = new Shelves(productList, promotionList);
-const checkout = new Checkout(shelves);
-
-const paymentPlan = checkout.createPaymentPlan(cart);
-```
+- 스텝별 기능을 간략히 설명한다\*\*\*
 
 ## 📄 테스트(Testing)
 
