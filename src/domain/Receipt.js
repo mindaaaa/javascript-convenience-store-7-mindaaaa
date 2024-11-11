@@ -1,33 +1,47 @@
 class Receipt {
-  constructor(purchaseItems, freeItems, paymentDetails) {
-    this.purchaseItems = purchaseItems;
-    this.freeItems = freeItems;
-    this.paymentDetails = paymentDetails;
-  }
-  getPurchaseItems() {
-    return this.purchaseItems.map(({ name, quantity, price }) => ({
-      name,
-      quantity,
-      price,
-    }));
-  }
-  getFreeItems() {
-    return this.freeItems.map(({ name, quantity }) => ({ name, quantity }));
-  }
-  getPaymentSummary() {
-    const totalItemCount =
-      this.purchaseItems.reduce((sum, item) => sum + item.quantity, 0) +
-      this.freeItems.reduce((sum, item) => sum + item.quantity, 0);
+  #priceSum;
+  #countSum;
+  #data;
+  #discountByMembership;
 
-    const { totalAmount, eventDiscount, membershipDiscount, finalAmount } =
-      this.paymentDetails;
-    return [
-      { label: '총구매액', count: totalItemCount, value: totalAmount },
-      { label: '행사할인', value: -eventDiscount },
-      { label: '멤버십할인', value: -membershipDiscount },
-      { label: '내실돈', value: finalAmount },
-    ];
+  constructor(price, count, data, discountByMembership) {
+    this.#priceSum = price;
+    this.#countSum = count;
+    this.#data = data;
+    this.#discountByMembership = discountByMembership;
+  }
+
+  toString() {
+    const primarySection = this.#data.map((e) => {
+      return `${e.name}\t${e.count}\t${e.price.toLocaleString()}`;
+    });
+
+    const promotionalTargets = this.#data.filter((e) => e.freebie);
+
+    const secondarySection = promotionalTargets.map((e) => {
+      return `${e.name}\t${e.freebie.count}`;
+    });
+
+    const discountByPromotion = promotionalTargets.reduce((acc, target) => {
+      return target.freebie.price + acc;
+    }, 0);
+
+    const result =
+      this.#priceSum - discountByPromotion - this.#discountByMembership;
+
+    return `===========W 편의점=============
+상품명\t수량\t금액
+${primarySection.join('\n')}
+===========증\t정=============
+${secondarySection.join('\n')}
+==============================
+총구매액\t${this.#countSum}\t${this.#priceSum.toLocaleString()}
+행사할인\t\t-${discountByPromotion.toLocaleString()}
+멤버십할인\t\t-${this.#discountByMembership.toLocaleString()}
+내실돈\t\t${result.toLocaleString()}
+
+`;
   }
 }
 
-export default Receipt();
+export default Receipt;
