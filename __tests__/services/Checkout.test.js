@@ -2,7 +2,7 @@ import Checkout from '../../src/services/Checkout.js';
 import Shelves from '../../src/domain/Shelves.js';
 import Cart from '../../src/domain/Cart.js';
 
-describe.skip('Checkout 클래스에 대해', () => {
+describe('Checkout 클래스에 대해', () => {
   let checkout;
   let shelves;
 

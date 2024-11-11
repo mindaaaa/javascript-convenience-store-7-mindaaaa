@@ -1,6 +1,6 @@
 import Shelves from '../../src/domain/Shelves.js';
 
-describe.skip('Shelves 클래스에 대해', () => {
+describe('Shelves 클래스에 대해', () => {
   const products = [
     { name: '콜라', price: 1000, quantity: 10, promotion: '탄산2+1' },
     { name: '콜라', price: 1000, quantity: 10, promotion: null },
