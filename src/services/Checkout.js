@@ -1,3 +1,5 @@
+import { ERROR_MESSAGES } from '../utils/constants.js';
+
 class Checkout {
   #shelves;
 
@@ -17,7 +19,7 @@ class Checkout {
     );
 
     if (!targetGoods) {
-      throw new Error('[ERROR] 존재하지 않는 상품입니다. 다시 입력해 주세요.');
+      throw new Error(ERROR_MESSAGES.PRODUCT_NOT_FOUND);
     }
 
     return targetGoods.getPaymentSummary(quantity);

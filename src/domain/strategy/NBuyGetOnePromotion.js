@@ -1,13 +1,11 @@
-import { PromotionViolation } from '../../utils/constants.js';
+import { ERROR_MESSAGES, PromotionViolation } from '../../utils/constants.js';
 
 class NBuyGetOnePromotion {
   #Unit;
 
   constructor(x) {
     if (typeof x !== 'number' || x <= 0) {
-      throw new Error(
-        '[ERROR] 올바르지 않은 형식으로 입력했습니다. 다시 입력해 주세요.'
-      );
+      throw new Error(ERROR_MESSAGES.INVALID_FORMAT);
     }
     this.#Unit = x + 1;
   }

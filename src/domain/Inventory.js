@@ -1,5 +1,5 @@
 import Promotion from './Promotion.js';
-import { PromotionViolation } from '../utils/constants.js';
+import { ERROR_MESSAGES, PromotionViolation } from '../utils/constants.js';
 
 class Inventory {
   #name;
@@ -20,9 +20,7 @@ class Inventory {
     const currentStockQuantity =
       this.#quantity + this.#promotion.summary.quantity;
     if (requestedQuantity > currentStockQuantity) {
-      throw new Error(
-        '[ERROR] 재고 수량을 초과하여 구매할 수 없습니다. 다시 입력해 주세요.'
-      );
+      throw new Error(ERROR_MESSAGES.EXCEEDS_STOCK);
     }
 
     const {
@@ -96,9 +94,7 @@ class Inventory {
     const stockAmount = this.#quantity + promotionStock;
 
     if (requestedQuantity > stockAmount) {
-      throw new Error(
-        '[ERROR] 재고 수량을 초과하여 구매할 수 없습니다. 다시 입력해 주세요.'
-      );
+      throw new Error(ERROR_MESSAGES.EXCEEDS_STOCK);
     }
 
     if (requestedQuantity > promotionStock) {

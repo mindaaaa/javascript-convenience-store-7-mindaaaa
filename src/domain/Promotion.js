@@ -1,5 +1,5 @@
 import { DateTimes } from '@woowacourse/mission-utils';
-import { PromotionType } from '../utils/constants.js';
+import { ERROR_MESSAGES, PromotionType } from '../utils/constants.js';
 import PromotionStrategy from './strategy/index.js';
 
 class Promotion {
@@ -31,7 +31,7 @@ class Promotion {
 
   getAvailableQuantity(requestedQuantity) {
     if (typeof requestedQuantity !== 'number' || requestedQuantity <= 0) {
-      throw new Error('[ERROR] 잘못된 입력입니다. 다시 입력해 주세요.');
+      throw new Error(ERROR_MESSAGES.INVALID_INPUT);
     }
 
     if (this.#isExpired) {
@@ -53,9 +53,7 @@ class Promotion {
 
   decrease(quantity) {
     if (quantity > this.#quantity) {
-      throw new Error(
-        '[ERROR] 재고 수량을 초과하여 구매할 수 없습니다. 다시 입력해 주세요.'
-      );
+      throw new Error(ERROR_MESSAGES.EXCEEDS_STOCK);
     }
 
     this.#quantity -= quantity;

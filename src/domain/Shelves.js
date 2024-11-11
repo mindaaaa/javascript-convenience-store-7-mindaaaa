@@ -1,4 +1,4 @@
-import { PromotionType } from '../utils/constants.js';
+import { ERROR_MESSAGES, PromotionType } from '../utils/constants.js';
 import Inventory from './Inventory.js';
 
 class Shelves {
@@ -56,7 +56,7 @@ class Shelves {
   tryFetchGoods(goodsName, regularQuantity, promotionalQuantity) {
     const target = this.#inventory.find((goods) => goods.name === goodsName);
     if (!target) {
-      throw new Error('[ERROR] 존재하지 않는 상품입니다. 다시 입력해 주세요.');
+      throw new Error(ERROR_MESSAGES.PRODUCT_NOT_FOUND);
     }
 
     target.decrease(regularQuantity, promotionalQuantity);

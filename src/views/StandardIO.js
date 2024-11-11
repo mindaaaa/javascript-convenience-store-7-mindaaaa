@@ -1,4 +1,5 @@
 import { Console } from '@woowacourse/mission-utils';
+import { ERROR_MESSAGES } from '../utils/constants.js';
 
 class StandardIO {
   write(output) {
@@ -15,7 +16,7 @@ class StandardIO {
     while (true) {
       try {
         if (answer !== 'N' && answer !== 'Y') {
-          throw new Error('[ERROR] 잘못된 입력입니다. 다시 입력해 주세요.');
+          throw new Error(ERROR_MESSAGES.INVALID_INPUT);
         }
 
         return answer;

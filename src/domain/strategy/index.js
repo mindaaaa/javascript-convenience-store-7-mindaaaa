@@ -1,4 +1,4 @@
-import { PromotionType } from '../../utils/constants.js';
+import { ERROR_MESSAGES, PromotionType } from '../../utils/constants.js';
 import NBuyGetOnePromotion from './NBuyGetOnePromotion.js';
 import NoneStrategy from './NoneStrategy.js';
 
@@ -12,7 +12,7 @@ const Strategy = {
 export default {
   from(type) {
     if (!Reflect.has(Strategy, type)) {
-      throw new Error('[ERROR] 잘못된 입력입니다. 다시 입력해 주세요.');
+      throw new Error(ERROR_MESSAGES.INVALID_INPUT);
     }
 
     return Reflect.get(Strategy, type);
