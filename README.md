@@ -464,7 +464,46 @@ const receipt = cashier.checkout(confirmedPlans, shouldDiscount);
 - `decrease(regularQuantity, promotionalQuantity)`: 최종 구매 결정에서 **재고 업데이트**
 - `summary`: 상품 이름, 가격, 잔여 재고 정보 반환
 
-###
+### Promotion 클래스
+
+- 특정 상품의 **프로모션 정보 관리**
+  - 재고 관리 포함
+  - 요청 수량에 프로모션 혜택 적용을 도움
+
+#### 주요 기능
+
+- 프로모션 생성: 상품의 이름, 유형, 수량, 프로모션 기간으로 초기화
+- 유효성 검사: 프로모션이 만료 여부를 검사
+- 프로모션 혜택 계산: 프로모션 혜택 적용 가능 수량을 판단하고, 위반 사항을 계산
+- 프로모션 재고 감소: 프로모션 적용 시 소모되는 재고 관리
+
+#### DateRange 클래스
+
+- `Promotion` 클래스의 프로모션 기간과 관련된 날짜 처리 로직
+
+#### 주요 기능
+
+- 날짜 범위 설정: 시작과 종료일을 기반으로 객체 초기화
+- 유효성 검사: 날짜가 범위 내에 들어있는지 확인
+
+#### 사용 예시
+
+```javascript
+const promoDateRange = new DateRange('2024-01-01', '2024-12-31');
+```
+
+```javascript
+const promotionData = {
+  name: '탄산2+1',
+  type: PromotionType.TWO_PLUS_ONE,
+  quantity: 10,
+  start_date: '2024-01-01',
+  end_date: '2024-12-31',
+};
+
+const promotion = new Promotion(promotionData);
+const availableQuantity = promotion.getAvailableQuantity(3); // 수량에 따른 혜택 제공
+```
 
 ###
 
