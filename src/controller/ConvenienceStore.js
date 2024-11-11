@@ -43,7 +43,7 @@ class ConvenienceStore {
     while (true) {
       try {
         const shoppingCart = new Cart(currentInput);
-        return this.#paymentPlanner.createDraftPaymentPlan(shoppingCart);
+        return this.#paymentPlanner.createPaymentPlan(shoppingCart);
       } catch (e) {
         this.#std.write(e.message);
         currentInput = await this.#std.readLine(`\n`);

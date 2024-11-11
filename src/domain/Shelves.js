@@ -32,8 +32,8 @@ class Shelves {
           name: promotional.promotion,
           type: this.#getPromotionType(promotional.promotion),
           quantity: promotional.quantity,
-          startFrom: promotion.start_date,
-          endTo: promotion.end_date,
+          start_date: promotion.start_date,
+          end_date: promotion.end_date,
         }
       );
     });

@@ -29,16 +29,16 @@ class Receipt {
     const result =
       this.#priceSum - discountByPromotion - this.#discountByMembership;
 
-    return `==============W 편의점================
-      상품명\t\t수량\t금액
+    return `===========W 편의점=============
+      상품명\t수량\t금액
       ${primarySection.join('\n')}
-      =============증\t정===============
+      ===========증\t정=============
       ${secondarySection.join('\n')}
-      ====================================
-      총구매액\t\t${this.#countSum}\t${this.#priceSum.toLocaleString()}
-      행사할인\t\t\t-${discountByPromotion.toLocaleString()}
-      멤버십할인\t\t\t-${this.#discountByMembership.toLocaleString()}
-      내실돈\t\t\t${result.toLocaleString()}
+      ==============================
+      총구매액\t${this.#countSum}\t${this.#priceSum.toLocaleString()}
+      행사할인\t\t-${discountByPromotion.toLocaleString()}
+      멤버십할인\t\t-${this.#discountByMembership.toLocaleString()}
+      내실돈\t\t${result.toLocaleString()}
       
       `;
   }
