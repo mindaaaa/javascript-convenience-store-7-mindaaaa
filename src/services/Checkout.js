@@ -8,20 +8,31 @@ class Checkout {
   }
 
   createPaymentPlan(shoppingCart) {
-    return shoppingCart.goods.map(({ name, quantity }) => {
-      return this.createPaymentSummary(name, quantity);
-    });
+    return this.#generatePaymentSummaries(shoppingCart.goods);
+  }
+
+  #generatePaymentSummaries(goodsList) {
+    return goodsList.map(({ name, quantity }) =>
+      this.createPaymentSummary(name, quantity)
+    );
   }
 
   createPaymentSummary(name, quantity) {
+    const targetGoods = this.#findTargetGoods(name);
+    return this.#generateSummary(targetGoods, quantity);
+  }
+
+  #findTargetGoods(name) {
     const targetGoods = this.#shelves.goods.find(
       (goods) => goods.name === name
     );
-
     if (!targetGoods) {
       throw new Error(ERROR_MESSAGES.PRODUCT_NOT_FOUND);
     }
+    return targetGoods;
+  }
 
+  #generateSummary(targetGoods, quantity) {
     return targetGoods.getPaymentSummary(quantity);
   }
 }
